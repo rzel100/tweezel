@@ -46,14 +46,14 @@ function playStory() {
     <hr>
     <div class="overflow-auto grow">
       <div class="bg-white p-2 container mx-auto">
-        <router-link :to="`/story/${story.story[0].id}/global`">
+        <router-link :to="`/story/${theStory}/global`">
           <div class="bg-sky-500 rounded text-white motion-safe:hover:bg-sky-400 motion-safe:transition p-0.5">
             <div class="overflow-hidden whitespace-nowrap p-2">Story Global Setting</div>
           </div>
         </router-link>
       </div>
       <div class="bg-white p-2 container mx-auto" v-for="(item, index) in story.story[theStory].passage">
-        <router-link :to="`/story/${story.story[0].id}/edit/${index}`">
+        <router-link :to="`/story/${theStory}/edit/${index}`">
           <div class="bg-sky-500 rounded text-white motion-safe:hover:bg-sky-400 motion-safe:transition p-0.5">
             <div class="overflow-hidden whitespace-nowrap p-2">{{item.name}}</div>
             <div class="overflow-hidden whitespace-nowrap p-2 text-black bg-white">{{item.data}}</div>

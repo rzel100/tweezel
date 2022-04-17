@@ -15,6 +15,14 @@ I Want U To Try Mine And Tell Me What Should I Add The Feature First.**
 
 If U Found Error When Play The Story. Try Restart The Sugarcube Engine.  
 I Want To Inject Auto-Restart Story Script To Fix This Issue But I Think That's Wrong.
+
+<hr>
+
+` v0.1.0 | 17 April 2022 | Progress "25%" ` Current Update Is About :
+- Remodeling App With Dark Theme... Wanna Get Rid Of Light Theme... Light Attract Bugs... :p
+- Add Function To Create A New Story... Finally... Delete Story Still Not Tho... :/
+- Still Considering "Should I Write Changelogs...???" The Answer Is "Yes"... So In The Future I Want To See My Progress... :)
+
 <hr>
 
 For Now, You Can :

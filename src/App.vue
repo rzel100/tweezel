@@ -9,7 +9,7 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <div font-sans>
+  <div class="font-sans bg-gray-700 text-white h-screen">
 
     <RouterView />
 
