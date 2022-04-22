@@ -6,28 +6,53 @@ import { ref } from 'vue';
 
 const story = storyData()
 const route = useRoute()
+const isNew = ref(false)
+const isDelete = ref('999999999')
+const passageName = ref('')
+const placePassageName = ref('Passage Name...')
 
 const theStory = route.params.id
 story.storyId = theStory
-function addPassage() {
-  let nowPid = 1
-  let arrPid = []
+function sameName(data) {
+  var nameSame = false
   for (let i = 0;i < story.story[theStory].passage.length;i++) {
-    arrPid.push(story.story[theStory].passage[i].pid)
-  }
-  arrPid.sort(function(a, b) {
-    return a - b;
-  });
-  for (let i = 0;i < arrPid.length;i++) {
-    if (arrPid[i] == nowPid) {
-      nowPid++
+    if (story.story[theStory].passage[i].name == data) {
+      nameSame = true
     }
   }
-  story.story[theStory].passage.push({
-    name : 'passage-name-'+nowPid,
-    pid : nowPid.toString(),
-    data : `Edit Your New Passage...`
-  })
+  return nameSame
+}
+function addPassage() {
+  if (passageName.value.length < 1) {
+    placePassageName.value = "Passage Name Is Required..."
+  } else if (sameName(passageName.value)){
+    passageName.value = ''
+    placePassageName.value = "Passage Name Already Exist..."
+  } else {
+    let nowPid = 1
+    let arrPid = []
+    for (let i = 0;i < story.story[theStory].passage.length;i++) {
+      arrPid.push(story.story[theStory].passage[i].pid)
+    }
+    arrPid.sort(function(a, b) {
+      return a - b;
+    });
+    for (let i = 0;i < arrPid.length;i++) {
+      if (arrPid[i] == nowPid) {
+        nowPid++
+      }
+    }
+    story.story[theStory].passage.push({
+      name : passageName.value,
+      pid : nowPid.toString(),
+      data : `Edit Your New Passage...`
+    })
+    isNew.value = false
+  }
+}
+function deletePassage(index) {
+  var spliced = story.story[theStory].passage.splice(index, 1)
+  isDelete.value = '999999999'
 }
 const playStats = ref('Play The Story')
 function playStory() {
@@ -40,27 +65,54 @@ function playStory() {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col">
-    <p class="text-center text-xl flex-none">Edit Passage</p>
-    <button @click="addPassage()" class="bg-green-500 p-1 text-white motion-safe:hover:bg-green-400 motion-safe:transition">Add New Passage +</button>
+  <div class="h-screen flex flex-col text-xs">
+    <div class="flex bg-black/25">
+      <p class="text-xl grow self-center p-1 truncate">{{story.story[theStory].title}}</p>
+      <router-link :to="`/story/${theStory}/play`">
+        <svg class="h-5 w-5 self-center m-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+        </svg>
+      </router-link>
+      <router-link :to="`/story/${theStory}/global`">
+        <svg class="h-5 w-5 self-center m-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+        </svg>
+      </router-link>
+    </div>
+    <div class="flex justify-center m-2 text-xs" v-if="!isNew">
+      <div class="w-full p-1">Passage List...</div>
+      <button @click="isNew = true; passageName = ''; placePassageName = 'Passage Name...'" class="ml-2 whitespace-nowrap bg-green-300 text-black px-2 rounded">Create New Passage</button>
+    </div>
+    <div class="flex justify-center m-2 text-xs" v-else>
+      <input type="text" v-model="passageName" :placeholder="placePassageName" class="text-white p-1 bg-transparent w-full outline-none outline-green-300 rounded placeholder:italic placeholder:text-slate-300"/>
+      <button @click="addPassage()" class="ml-2 whitespace-nowrap bg-green-300 text-black px-2 rounded">Create !</button>
+      <button @click="isNew = false" class="ml-2 whitespace-nowrap bg-red-300 text-black px-2 rounded">Cancel</button>
+    </div>
     <hr>
-    <div class="overflow-auto grow">
-      <div class="bg-white p-2 container mx-auto">
-        <router-link :to="`/story/${theStory}/global`">
-          <div class="bg-sky-500 rounded text-white motion-safe:hover:bg-sky-400 motion-safe:transition p-0.5">
-            <div class="overflow-hidden whitespace-nowrap p-2">Story Global Setting</div>
-          </div>
+    <div class="grow overflow-auto">
+      <div class="flex motion-safe:hover:bg-black/20 motion-safe:transition" v-for="(item, index) in story.story[theStory].passage">
+        <router-link :to="`/story/${theStory}/edit/${index}`" class="grow mx-2 py-2 truncate">
+          <div class="w-full">{{item.name}}</div>
         </router-link>
-      </div>
-      <div class="bg-white p-2 container mx-auto" v-for="(item, index) in story.story[theStory].passage">
-        <router-link :to="`/story/${theStory}/edit/${index}`">
-          <div class="bg-sky-500 rounded text-white motion-safe:hover:bg-sky-400 motion-safe:transition p-0.5">
-            <div class="overflow-hidden whitespace-nowrap p-2">{{item.name}}</div>
-            <div class="overflow-hidden whitespace-nowrap p-2 text-black bg-white">{{item.data}}</div>
+        <div class="grow-0">
+          <div v-if="isDelete != index" class="flex mx-2">
+            <button @click="isDelete = index" class="bg-red-500 self-center rounded p-0.5">
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </button>
           </div>
-        </router-link>
+          <div v-else-if="isDelete == index" class="flex mx-2">
+            <div class="self-center text-xs mr-1"> Delete ?.</div>
+            <button @click="deletePassage(index)" class="bg-red-400 rounded self-center text-xs p-0.5 text-black">
+              Delete
+            </button>
+            <button @click="isDelete = '999999999'" class="bg-green-300 rounded self-center text-xs p-0.5 ml-1 text-black">
+              Cancel
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-    <button @click="playStory()" class="bg-green-500 p-2 text-white">{{playStats}}</button>
   </div>
 </template>

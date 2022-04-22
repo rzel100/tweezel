@@ -2,34 +2,38 @@
 import { useRoute } from 'vue-router'
 import { storyData } from '@/stores/story'
 import { ref } from 'vue';
-import router from '../router';
+//import router from '../router';
 const story = storyData()
 const route = useRoute()
-
+const isWrap = ref(true)
 const theStory = route.params
-const isDelete = ref(false)
-function deletePassage() {
-  var spliced = story.story[theStory.id].passage.splice(theStory.pid, 1)
-  router.back()
+const passageNames = ref(story.story[theStory.id].passage[theStory.pid].name)
+
+function setTitle() {
+  if (passageNames.value) {
+    story.story[theStory.id].passage[theStory.pid].name = passageNames.value
+  }
 }
 </script>
 
 <template>
   <div class="h-screen flex flex-col">
-    <p class="text-center flex-none">Editing Passage</p>
-    <hr>
-    <div class="flex justify-center m-2">
-      <p class="text-center text-sm">Passage Names</p>
-      <input type="text" v-model="story.story[theStory.id].passage[theStory.pid].name" class="p-1 outline-none border rounded w-full"/>
+    <div class="flex bg-black/25">
+      <p class="text-xl grow self-center p-1">Editing Passage</p>
     </div>
-    <textarea type="textarea" v-model="story.story[theStory.id].passage[theStory.pid].data" class="p-1 outline-none border rounded w-full resize-none grow"></textarea>
-    <div class="flex" v-if="!isDelete">
-      <button @click="isDelete = true" class="grow bg-red-500 text-white p-2">Delete Passage</button>
+    <div class="flex justify-center m-2 text-xs">
+      <p class="self-center text-center">Passage Names</p>
+      <input type="text" placeholder="Passage Title Must Not Empty" v-model="passageNames" class="font-mono bg-transparent p-1 outline-none border rounded w-full placeholder:italic placeholder:text-slate-300"/>
+      <button @click="setTitle" class="self-center rounded bg-green-300 text-black p-2">Set</button>
     </div>
-    <div class="flex" v-else>
-      <div class="grow bg-red-500 text-white p-2">Delete Passage ?.</div>
-      <button @click="deletePassage()" class="bg-red-800 text-white px-5">Yes</button>
-      <button @click="isDelete = false" class="bg-sky-500 text-white px-5">No</button>
+    <div class="flex justify-start m-2 text-xs">
+      <button v-if="isWrap" @click="isWrap = false" class="flex flex-row rounded bg-green-300 text-black p-1">Wrap <svg class="h-4 w-4 self-center ml-1" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg></button>
+      <button v-if="!isWrap" @click="isWrap = true" class="flex flex-row rounded bg-green-300 text-black p-1">Wrap <svg class="h-4 w-4 self-center ml-1" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+      </svg></button>
     </div>
+    <textarea type="textarea" v-model="story.story[theStory.id].passage[theStory.pid].data" :class="[isWrap ? 'whitespace-pre' : '', 'text-xs font-mono bg-transparent p-1 outline-none border rounded w-full resize-none grow']"></textarea>
   </div>
 </template>

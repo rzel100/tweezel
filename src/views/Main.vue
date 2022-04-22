@@ -3,10 +3,11 @@ import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { storyData } from '@/stores/story'
 const story = storyData()
-const findStory = ref('')
 const storyName = ref('')
 const placeStoryName = ref('Story Name...')
 const isNew = ref(false)
+const isDelete = ref('999999999')
+const mode = ref('story')
 
 function uuidv4() {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -22,10 +23,9 @@ function createStory() {
     placeStoryName.value = "Story Name Is Required..."
   } else {
     let ifid = generateIFID()
-    console.log(ifid)
     let newStory = {
       title : storyName.value,
-      ifid : ifid.value,
+      ifid : ifid,
       startNode : '1',
       userStyle : '/* Design Your Styling In Here */',
       userScript : '// Type Your Own Javascript In Here',
@@ -50,92 +50,146 @@ To Fix That, Try To Add A New Passage And Name It "pit".`
       ]
     }
     story.story.push(newStory)
-    console.log(story.story)
+    isNew.value = false
   }
 }
 
-function resetStory() {
-  story.story = [
-    {
-      title : 'My Awesome Story',
-      ifid : 'E9AFFAED-9D44-4D87-979D-3089F0C5FF4C',
-      startNode : '1',
-      userStyle : '/* Design Your Styling In Here */',
-      userScript : '// Type Your Own Javascript In Here',
-      passage : [
-        {
-          name : 'start',
-          pid : '1',
-          data : `This Is Your Start Passage.
-Quick Tips.
-To Add Link / Ways To Other Passage Use
-[[about]] <- This Display "about", When Clicked Go To "about" Passage.
-[[This Is About|about]] <- This Display "This Is About", When Clicked Go To "about" Passage.`
-        },
-        {
-          name : 'about',
-          pid : '2',
-          data : `This Is Your About Passage
-Try To Link From Here To "start" Just Use Like In The [[start]] Passage.
-Beware Of Passage Link That Leads To Nowhere !. Like This -> [[pit]] Or [[Go To Pit|pit]].
-To Fix That, Try To Add A New Passage And Name It "pit".`
-        }
-      ]
-    }
-  ]
+function deleteStory(index) {
+  let spliced = story.story.splice(index, 1)
+  isDelete.value = '999999999'
 }
-/* Backup...
-<p class="p-2">Tools For Creating Twine Games Focused On Android</p>
-<p class="text-white/75 text-sm p-2">This App Still In Very Early Dev. You Can Play And Edit The Story. But Still Can't Export It.</p>
-var obj = { Name: "Joe" };
 
-obj.Age = 12;
-console.log(obj.Age)
+function checkLegit(data) {
+  let legit = false
+  if (data.title && data.ifid && data.startNode && data.passage) {
+    legit = true
+  }
+  return legit
+}
 
-var macan = 'halo'
-obj[macan] = 'Ini...'
-console.log(obj.halo)
+function readData() {
+  let file_to_read = document.getElementById("jsonfileinput").files[0]
+  if (file_to_read != undefined) {
+    let fileread = new FileReader()
+    fileread.onload = function(e) {
+      let content = e.target.result
+      let storyData = JSON.parse(content)
+      if (checkLegit(storyData)) {
+        story.story.push(storyData)
+      }
+      mode.value = 'story'
+    }
+    fileread.readAsText(file_to_read)
+  }
+}
 
-obj['Country'] =  "USA"
-console.log(obj.Country)
+function readWholeData() {
+  let file_to_read = document.getElementById("jsonwholestoryfileinput").files[0]
+  if (file_to_read != undefined) {
+    let fileread = new FileReader()
+    fileread.onload = function(e) {
+      let content = e.target.result
+      let storyData = JSON.parse(content)
+      console.log(storyData)
+      if (storyData.length > 0) {
+        for (let i = 0;i < storyData.length;i++) {
+          if (checkLegit(storyData[i])) {
+            story.story.push(storyData[i])
+          }
+        }
+      }
+      mode.value = 'story'
+    }
+    fileread.readAsText(file_to_read)
+  }
+}
 
-console.log(obj)
-*/
+function download(filename, text) {
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const d = new Date();
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename+' '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+'.tweezeldata');
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
 </script>
 
 <template>
   <div class="flex flex-col h-screen">
-    <div class="flex bg-black/25">
-      <p class="text-2xl grow self-center pl-2">TweezeL</p>
-      <svg class="h-5 w-5 self-center m-2" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-      </svg>
+    <div class="flex">
+      <p class="grow-0 self-center p-2 border-b-2 bg-black/20">TweezeL</p>
+      <button @click="mode = 'story'" :class="[mode == 'story' ? '' : 'border-b-2 bg-black/20', 'grow']">Story List</button>
+      <button @click="mode = 'setting'" :class="[mode == 'setting' ? '' : 'border-b-2 bg-black/20', 'grow-0']">
+        <svg class="h-5 w-5 self-center m-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+        </svg>
+      </button>
+      <button @click="mode = 'about'" :class="[mode == 'about' ? '' : 'border-b-2 bg-black/20', 'grow-0']">
+        <svg class="h-5 w-5 self-center m-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+        </svg>
+      </button>
     </div>
-    <div class="flex justify-center m-2 text-xs" v-if="!isNew">
-      <input type="text" v-model="findStory" placeholder="Find Story..." class="text-white p-1 outline-none bg-transparent w-full placeholder:italic placeholder:text-slate-300"/>
-      <button @click="isNew = true; storyName = ''" class="ml-2 whitespace-nowrap bg-green-300 text-black px-2 rounded">Create New Story</button>
-    </div>
-    <div class="flex justify-center m-2 text-xs" v-else>
-      <input type="text" v-model="storyName" :placeholder="placeStoryName" class="text-white p-1 outline-none bg-transparent w-full placeholder:italic placeholder:text-slate-300"/>
-      <button @click="createStory()" class="ml-2 whitespace-nowrap bg-green-300 text-black px-2 rounded">Start Creating !</button>
-      <button @click="isNew = false" class="ml-2 whitespace-nowrap bg-red-300 text-black px-2 rounded">Cancel</button>
-    </div>
-    <div class="grow overflow-auto">
-      <div class="flex motion-safe:hover:bg-black/20 motion-safe:transition" v-for="(data, index) in story.story">
-        <router-link :to="`/story/${index}`" class="grow mx-2 py-2">
-          <div class="w-full">{{data.title}}</div>
-        </router-link>
-        <div class="bg-red-500 p-0.5 mx-2 self-center rounded">
-          <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-          </svg>
+    <div class="w-full grow text-xs overflow-auto" v-if="mode == 'story'">
+      <div class="flex justify-center m-2 text-xs" v-if="!isNew">
+        <div class="w-full p-1">Story List...</div>
+        <button @click="isNew = true; storyName = ''; placeStoryName = 'Story Name...'" class="ml-2 whitespace-nowrap bg-green-300 text-black px-2 rounded">Create New Story</button>
+      </div>
+      <div class="flex justify-center m-2 text-xs" v-else>
+        <input type="text" v-model="storyName" :placeholder="placeStoryName" class="text-white p-1 bg-transparent w-full outline-none outline-green-300 rounded placeholder:italic placeholder:text-slate-300"/>
+        <button @click="createStory()" class="ml-2 whitespace-nowrap bg-green-300 text-black px-2 rounded">Start Creating !</button>
+        <button @click="isNew = false" class="ml-2 whitespace-nowrap bg-red-300 text-black px-2 rounded">Cancel</button>
+      </div>
+      <hr>
+      <div class="grow overflow-auto">
+        <div class="flex motion-safe:hover:bg-black/20 motion-safe:transition" v-for="(data, index) in story.story">
+          <router-link :to="`/story/${index}`" class="grow mx-2 py-2 truncate">
+            <div>{{data.title}}</div>
+          </router-link>
+          <div v-if="isDelete != index" class="flex mx-2">
+            <button @click="isDelete = index" class="bg-red-500 self-center rounded p-0.5">
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+          <div v-else-if="isDelete == index" class="flex mx-2">
+            <div class="self-center text-xs mr-1"> Delete ?.</div>
+            <button @click="deleteStory(index)" class="bg-red-400 rounded self-center text-xs p-0.5 text-black">
+              Delete
+            </button>
+            <button @click="isDelete = '999999999'" class="bg-green-300 rounded self-center text-xs p-0.5 ml-1 text-black">
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </div>
-    <div>
-      <button @click="resetStory()" class="bg-sky-600 rounded motion-safe:hover:bg-sky-400 motion-safe:transition outline-0 text-white p-2 mt-6 text-center">
-        Reset Story
-      </button>
+    <div class="w-full grow text-xs overflow-auto" v-if="mode == 'setting'">
+      <p class="p-1 mt-2">Load Story From Backup<br>(The Story Will Be Appended, Not Replaced.)<br>Will Redirect To Story List. If Success The Story Will Be There In The List.</p>
+      <div class="text-xs flex">
+        <input class="grow p-1" type="file" id="jsonfileinput" />
+        <button @click="readData" class="m-1 whitespace-nowrap bg-green-300 text-black px-2 rounded">Load Backup</button>
+      </div>
+      <hr>
+      <p class="p-1">Create Backup Of An Entire Story</p>
+      <button @click="download('TweezeL Backup', JSON.stringify(story.story))" class="rounded bg-green-300 text-black p-1 m-1">Backup Entire Story.</button>
+      <p class="p-1 mt-5">Load Backup Of An Entire Story<br>(The Story Will Be Appended, Not Replaced.)</p>
+      <div class="text-xs flex">
+        <input class="grow p-1" type="file" id="jsonwholestoryfileinput" />
+        <button @click="readWholeData" class="m-1 whitespace-nowrap bg-green-300 text-black px-2 rounded">Load Backup</button>
+      </div>
+    </div>
+    <div class="w-full grow overflow-auto" v-if="mode == 'about'">
+      <p class="p-1 mt-2">TweezeL Is A Free Tools For Creating Twine Games Focused For Android.</p>
+      <p class="p-1 mt-2">The Feature Is Not Good Like Twine Or Tweego. But At Least It's Device Friendly Than Twine. And User Friendly Than Tweego. :)</p>
+      <p class="p-1 mt-2">For Now The Only And Default Story Formats Is Sugarcube v2 Story Formats.<br>
+        <a class="text-green-300 underline" href="http://www.motoslave.net/sugarcube/2/docs/" target="_blank" rel="noopener noreferrer">Go To Here</a> To Read It's Documentations For People Who Want To Do More In Their Story.</p>
+      <p class="p-1 mt-2">This Tools More Like Tweego But With GUI. For Those Who Never Code Twine Games With Tweego And Wanna Try This Tools.<br>
+        Just Create A New Story To Read Some Very Basic Tutorial :).</p>
     </div>
   </div>
 </template>

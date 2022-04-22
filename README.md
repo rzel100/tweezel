@@ -18,15 +18,8 @@ I Want To Inject Auto-Restart Story Script To Fix This Issue But I Think That's 
 
 <hr>
 
-` v0.1.0 | 17 April 2022 | Progress "25%" ` Current Update Is About :
-- Remodeling App With Dark Theme... Wanna Get Rid Of Light Theme... Light Attract Bugs... :p
-- Add Function To Create A New Story... Finally... Delete Story Still Not Tho... :/
-- Still Considering "Should I Write Changelogs...???" The Answer Is "Yes"... So In The Future I Want To See My Progress... :)
-
-<hr>
-
 For Now, You Can :
-- [x] Edit Existing Story.
+- [x] Add, Edit and Delete Story.
   - [x] Edit Title Story.
   - [x] Generate IFID.
   - [x] Set Story Start
@@ -36,24 +29,16 @@ For Now, You Can :
 - [x] Use Custom Javascript And Css.
 - [x] You Can Pretty Much Use All Sugarcube `< v2.36.1` Syntax.
 - [x] Run Edited Story.
-- [x] The Story Saved Locally On Browser.
+- [x] Backup And Restore All Story Or Some Of Them.
+- [x] Can Export To .html File.
+- [x] Built In Tutorial.
+- [x] Also Dark Theme. Light Attract Bugs. :3
 
 <hr>
 
-Later, In Short Span Of Time, I Want This Tools To Be :
-- [ ] Build To Apk. So It Can Be Installed On Android.
-- [ ] Can Run Offline. (It Can. But For Now Use Browser Instead.)
-- [ ] Add, Edit and Delete Story.
-- [ ] Can Export To .html File.
-- [ ] Built In Tutorial.
-- [ ] Also Dark Theme. Light Attract Bugs. :3
-
-<hr>
-
-For Final Objective Of This Tools, I Want This Tools To :
+For Next Objective Of This Tools, I Want This Tools To :
+- [ ] Re-Order The List. Like List Of Story And List Of Passage. It Must Be Re-Order.
 - [ ] Support Many Twine Story Formats.
-- [ ] Reconsidering The Layout. (Now Layout Seems. Dunno. Not Bad But Need To Be Better.)
 - [ ] Error Handling. (For Now There Is No Error Handling. You Even Can Use Duplicated Passage Names. Will Error When Run Tho.)
 - [ ] I Didn't Know Much About Filesystem. But I Think On Original Twine App There Is No Insert Local Img Rather Than Online Img Source. So I Think Handle Files Such Img And Video Is Not That Useful. Since U Can Use Online Source Instead.
-- [ ] Can Run Without Server. :3
 - [ ] So Much More (Still Not Think Of It Tho. :P. Well I Will Figure It Later When Developing This Tools In The Future. :3)
