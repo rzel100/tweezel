@@ -3,6 +3,7 @@ import { useRoute, RouterLink } from 'vue-router'
 import { storyData } from '@/stores/story'
 import router from '../router';
 import { ref } from 'vue';
+import draggable from 'vuedraggable'
 
 const story = storyData()
 const route = useRoute()
@@ -13,6 +14,7 @@ const placePassageName = ref('Passage Name...')
 
 const theStory = route.params.id
 story.storyId = theStory
+const passageList = ref(story.story[theStory].passage)
 function sameName(data) {
   var nameSame = false
   for (let i = 0;i < story.story[theStory].passage.length;i++) {
@@ -90,29 +92,40 @@ function playStory() {
     </div>
     <hr>
     <div class="grow overflow-auto">
-      <div class="flex motion-safe:hover:bg-black/20 motion-safe:transition" v-for="(item, index) in story.story[theStory].passage">
-        <router-link :to="`/story/${theStory}/edit/${index}`" class="grow mx-2 py-2 truncate">
-          <div class="w-full">{{item.name}}</div>
-        </router-link>
-        <div class="grow-0">
-          <div v-if="isDelete != index" class="flex mx-2">
-            <button @click="isDelete = index" class="bg-red-500 self-center rounded p-0.5">
+      <draggable
+        :list="passageList"
+        handle=".handle"
+        item-key="pid"
+      >
+        <template #item="{element, index}">
+          <div class="flex motion-safe:hover:bg-black/20 motion-safe:transition">
+            <div class="handle self-center pl-1">
               <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
               </svg>
-            </button>
+            </div>
+            <router-link :to="`/story/${theStory}/edit/${index}`" class="grow mx-2 py-2 truncate">
+              <div class="w-full">{{element.name}}</div>
+            </router-link>
+            <div v-if="isDelete != index" class="flex mx-2">
+              <button @click="isDelete = index" class="bg-red-500 self-center rounded p-0.5">
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+            <div v-else-if="isDelete == index" class="flex mx-2">
+              <div class="self-center text-xs mr-1"> Delete ?.</div>
+              <button @click="deletePassage(index)" class="bg-red-400 rounded self-center text-xs p-0.5 text-black">
+                Delete
+              </button>
+              <button @click="isDelete = '999999999'" class="bg-green-300 rounded self-center text-xs p-0.5 ml-1 text-black">
+                Cancel
+              </button>
+            </div>
           </div>
-          <div v-else-if="isDelete == index" class="flex mx-2">
-            <div class="self-center text-xs mr-1"> Delete ?.</div>
-            <button @click="deletePassage(index)" class="bg-red-400 rounded self-center text-xs p-0.5 text-black">
-              Delete
-            </button>
-            <button @click="isDelete = '999999999'" class="bg-green-300 rounded self-center text-xs p-0.5 ml-1 text-black">
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
+        </template>
+      </draggable>
     </div>
   </div>
 </template>

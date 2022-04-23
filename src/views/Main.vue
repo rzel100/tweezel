@@ -2,12 +2,14 @@
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { storyData } from '@/stores/story'
+import draggable from 'vuedraggable'
 const story = storyData()
 const storyName = ref('')
 const placeStoryName = ref('Story Name...')
 const isNew = ref(false)
 const isDelete = ref('999999999')
 const mode = ref('story')
+const storyList = ref(story.story)
 
 function uuidv4() {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -90,7 +92,6 @@ function readWholeData() {
     fileread.onload = function(e) {
       let content = e.target.result
       let storyData = JSON.parse(content)
-      console.log(storyData)
       if (storyData.length > 0) {
         for (let i = 0;i < storyData.length;i++) {
           if (checkLegit(storyData[i])) {
@@ -121,13 +122,13 @@ function download(filename, text) {
   <div class="flex flex-col h-screen">
     <div class="flex">
       <p class="grow-0 self-center p-2 border-b-2 bg-black/20">TweezeL</p>
-      <button @click="mode = 'story'" :class="[mode == 'story' ? '' : 'border-b-2 bg-black/20', 'grow']">Story List</button>
-      <button @click="mode = 'setting'" :class="[mode == 'setting' ? '' : 'border-b-2 bg-black/20', 'grow-0']">
+      <button @click="mode = 'story'" :class="[mode == 'story' ? 'text-green-300' : 'border-b-2 bg-black/20', 'grow']">Story List</button>
+      <button @click="mode = 'setting'" :class="[mode == 'setting' ? 'text-green-300' : 'border-b-2 bg-black/20', 'grow-0']">
         <svg class="h-5 w-5 self-center m-2" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
         </svg>
       </button>
-      <button @click="mode = 'about'" :class="[mode == 'about' ? '' : 'border-b-2 bg-black/20', 'grow-0']">
+      <button @click="mode = 'about'" :class="[mode == 'about' ? 'text-green-300' : 'border-b-2 bg-black/20', 'grow-0']">
         <svg class="h-5 w-5 self-center m-2" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
         </svg>
@@ -145,27 +146,40 @@ function download(filename, text) {
       </div>
       <hr>
       <div class="grow overflow-auto">
-        <div class="flex motion-safe:hover:bg-black/20 motion-safe:transition" v-for="(data, index) in story.story">
-          <router-link :to="`/story/${index}`" class="grow mx-2 py-2 truncate">
-            <div>{{data.title}}</div>
-          </router-link>
-          <div v-if="isDelete != index" class="flex mx-2">
-            <button @click="isDelete = index" class="bg-red-500 self-center rounded p-0.5">
+        <draggable
+        :list="storyList"
+        handle=".handle"
+        item-key="title"
+      >
+        <template #item="{element, index}">
+          <div class="flex motion-safe:hover:bg-black/20 motion-safe:transition">
+            <div class="handle self-center pl-1">
               <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
               </svg>
-            </button>
+            </div>
+            <router-link :to="`/story/${index}`" class="grow mx-2 py-2 truncate">
+              <div>{{element.title}}</div>
+            </router-link>
+            <div v-if="isDelete != index" class="flex mx-2">
+              <button @click="isDelete = index" class="bg-red-500 self-center rounded p-0.5">
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+            <div v-else-if="isDelete == index" class="flex mx-2">
+              <div class="self-center text-xs mr-1"> Delete ?.</div>
+              <button @click="deleteStory(index)" class="bg-red-400 rounded self-center text-xs p-0.5 text-black">
+                Delete
+              </button>
+              <button @click="isDelete = '999999999'" class="bg-green-300 rounded self-center text-xs p-0.5 ml-1 text-black">
+                Cancel
+              </button>
+            </div>
           </div>
-          <div v-else-if="isDelete == index" class="flex mx-2">
-            <div class="self-center text-xs mr-1"> Delete ?.</div>
-            <button @click="deleteStory(index)" class="bg-red-400 rounded self-center text-xs p-0.5 text-black">
-              Delete
-            </button>
-            <button @click="isDelete = '999999999'" class="bg-green-300 rounded self-center text-xs p-0.5 ml-1 text-black">
-              Cancel
-            </button>
-          </div>
-        </div>
+        </template>
+      </draggable>
       </div>
     </div>
     <div class="w-full grow text-xs overflow-auto" v-if="mode == 'setting'">
@@ -183,13 +197,14 @@ function download(filename, text) {
         <button @click="readWholeData" class="m-1 whitespace-nowrap bg-green-300 text-black px-2 rounded">Load Backup</button>
       </div>
     </div>
-    <div class="w-full grow overflow-auto" v-if="mode == 'about'">
+    <div class="w-full text-xs grow overflow-auto" v-if="mode == 'about'">
       <p class="p-1 mt-2">TweezeL Is A Free Tools For Creating Twine Games Focused For Android.</p>
       <p class="p-1 mt-2">The Feature Is Not Good Like Twine Or Tweego. But At Least It's Device Friendly Than Twine. And User Friendly Than Tweego. :)</p>
-      <p class="p-1 mt-2">For Now The Only And Default Story Formats Is Sugarcube v2 Story Formats.<br>
+      <p class="p-1 mt-2">For Now The Only And Default Story Formats Is Sugarcube v2.36.1 Story Formats.<br>
         <a class="text-green-300 underline" href="http://www.motoslave.net/sugarcube/2/docs/" target="_blank" rel="noopener noreferrer">Go To Here</a> To Read It's Documentations For People Who Want To Do More In Their Story.</p>
-      <p class="p-1 mt-2">This Tools More Like Tweego But With GUI. For Those Who Never Code Twine Games With Tweego And Wanna Try This Tools.<br>
-        Just Create A New Story To Read Some Very Basic Tutorial :).</p>
+      <p class="p-1 mt-2">This Tools Is More Or Less Like Tweego But With GUI. For Those Who Never Code Twine Games With Tweego And Wanna Try This Tools.<br>
+        Just Create A New Story To Read Some Very Basic Tutorial :).<br>
+        Or <a class="text-green-300 underline" href="https://www.youtube.com/playlist?list=PLb4OE-UTEU-86vltmWTJTBkbYEWbGSebe" target="_blank" rel="noopener noreferrer">Go To Here.</a> It's My Youtube Playlist. Some Video About This Project. Like Basic Tutorial And Such Things.</p>
     </div>
   </div>
 </template>

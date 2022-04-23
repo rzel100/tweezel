@@ -1,7 +1,7 @@
 # tweezel
 
 TweezeL Is A Free Tools For Creating Twine Games On Android.  
-This Tools Build With **VueJS 3 & VueJS 2 + Tailwind Css** For Styling.
+This Tools Build With **VueJS 3 + Tailwind Css** For Styling.
 
 Link Tools : https://tweezel.netlify.app
 
@@ -33,11 +33,11 @@ For Now, You Can :
 - [x] Can Export To .html File.
 - [x] Built In Tutorial.
 - [x] Also Dark Theme. Light Attract Bugs. :3
+- [x] Finally... You Can Re-Order The List.
 
 <hr>
 
 For Next Objective Of This Tools, I Want This Tools To :
-- [ ] Re-Order The List. Like List Of Story And List Of Passage. It Must Be Re-Order.
 - [ ] Support Many Twine Story Formats.
 - [ ] Error Handling. (For Now There Is No Error Handling. You Even Can Use Duplicated Passage Names. Will Error When Run Tho.)
 - [ ] I Didn't Know Much About Filesystem. But I Think On Original Twine App There Is No Insert Local Img Rather Than Online Img Source. So I Think Handle Files Such Img And Video Is Not That Useful. Since U Can Use Online Source Instead.

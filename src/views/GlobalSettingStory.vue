@@ -39,9 +39,9 @@ function setTitle() {
       <p class="text-xl grow self-center p-1">Global Story Setting</p>
     </div>
     <div class="flex">
-      <button @click="mode = 'setting'" :class="[mode == 'setting' ? '' : 'border-b-2 bg-black/20', 'grow']">Setting</button>
-      <button @click="mode = 'css'" :class="[mode == 'css' ? '' : 'border-b-2 bg-black/20', 'grow']">CSS</button>
-      <button @click="mode = 'js'" :class="[mode == 'js' ? '' : 'border-b-2 bg-black/20', 'grow']">Javascript</button>
+      <button @click="mode = 'setting'" :class="[mode == 'setting' ? 'text-green-300' : 'border-b-2 bg-black/20', 'grow']">Setting</button>
+      <button @click="mode = 'css'" :class="[mode == 'css' ? 'text-green-300' : 'border-b-2 bg-black/20', 'grow']">CSS</button>
+      <button @click="mode = 'js'" :class="[mode == 'js' ? 'text-green-300' : 'border-b-2 bg-black/20', 'grow']">Javascript</button>
     </div>
     <div class="p-1 w-full grow text-xs overflow-auto" v-if="mode == 'setting'">
       <p class="p-1">Story Title</p>
