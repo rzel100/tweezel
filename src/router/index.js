@@ -1,5 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Main from '../views/Main.vue'
+import Story from '../views/Story.vue'
+import StoryEdit from '../views/StoryEdit.vue'
+import GlobalSettingStory from '../views/GlobalSettingStory.vue'
+import PlayStory from '../views/PlayStory.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,22 +16,22 @@ const router = createRouter({
     {
       path: '/story/:id',
       name: 'story',
-      component: () => import('../views/Story.vue')
+      component: Story
     },
     {
       path: '/story/:id/edit/:pid',
       name: 'edit story',
-      component: () => import('../views/StoryEdit.vue')
+      component: StoryEdit
     },
     {
       path: '/story/:id/global',
       name: 'global setting',
-      component: () => import('../views/GlobalSettingStory.vue')
+      component: GlobalSettingStory
     },
     {
       path: '/story/:id/play',
       name: 'play story',
-      component: () => import('../views/PlayStory.vue')
+      component: PlayStory
     },
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: Main }
   ]

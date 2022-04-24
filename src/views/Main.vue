@@ -121,7 +121,7 @@ function download(filename, text) {
 <template>
   <div class="flex flex-col h-screen">
     <div class="flex">
-      <p class="grow-0 self-center p-2 border-b-2 bg-black/20">TweezeL</p>
+      <button class="grow-0 self-center p-2 border-b-2 bg-black/20">TweezeL</button>
       <button @click="mode = 'story'" :class="[mode == 'story' ? 'text-green-300' : 'border-b-2 bg-black/20', 'grow']">Story List</button>
       <button @click="mode = 'setting'" :class="[mode == 'setting' ? 'text-green-300' : 'border-b-2 bg-black/20', 'grow-0']">
         <svg class="h-5 w-5 self-center m-2" viewBox="0 0 20 20" fill="currentColor">

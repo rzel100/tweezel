@@ -36,3 +36,13 @@ Date : 23-April-2022
 List Addition / Changes :
 - Now You Can Reorder The List Of Story And Passages.
 - Fixing Some Styling.
+
+## 0.1.2
+Date : 24-April-2022
+
+> Small Changes.
+
+List Addition / Changes :
+- Removed "Generate IFID" Button. Since IFID Is Unique ID It Should Only Generate When Creating Story.
+- Fixing Some Styling.
+- Fixing Some 404 Error Not Found. Hope This Works.

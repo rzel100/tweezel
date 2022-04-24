@@ -9,14 +9,6 @@ const isWrap = ref(true)
 const theStory = route.params
 const storyNames = ref(story.story[theStory.id].title)
 
-function uuidv4() {
-  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-  );
-}
-function generateIFID() {
-  story.story[theStory.id].ifid = uuidv4().toString().toUpperCase()
-}
 function download(filename, text) {
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -54,8 +46,7 @@ function setTitle() {
       <option class="bg-gray-700" v-for="data in story.story[theStory.id].passage" :value="data.pid">{{data.name}}</option>
       </select>
       <p class="p-1 mt-2">IFID</p>
-      <input type="text" v-model="story.story[theStory.id].ifid" disabled class="font-mono bg-transparent p-1 overflow-auto outline-none border rounded w-full"/>
-      <button @click="generateIFID()" class="rounded bg-green-300 text-black p-1 mt-1">Generate New IFID</button><br>
+      <input type="text" v-model="story.story[theStory.id].ifid" disabled class="font-mono bg-transparent p-1 overflow-auto outline-none border rounded w-full text-white/50"/>
       <button @click="download(story.story[theStory.id].title+'.tweezeldata', JSON.stringify(story.story[theStory.id]))" class="rounded bg-green-300 text-black p-1 mt-5">Backup This Story.</button>
     </div>
     <div class="p-1 outline-none w-full grow flex flex-col" v-if="mode == 'css'">

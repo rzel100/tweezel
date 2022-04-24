@@ -21,7 +21,7 @@ I Want To Inject Auto-Restart Story Script To Fix This Issue But I Think That's 
 For Now, You Can :
 - [x] Add, Edit and Delete Story.
   - [x] Edit Title Story.
-  - [x] Generate IFID.
+  - [x] Generate IFID. (Now Generate IFID Only When Creating Story.)
   - [x] Set Story Start
   - [x] Create Passage.
   - [x] Delete Passage.
