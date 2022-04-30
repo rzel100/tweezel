@@ -48,12 +48,22 @@ List Addition / Changes :
 - Fixing Some 404 Error Not Found. Hope This Works.
 
 ## 0.1.2.X
-Date : 25-April-2022 Until ~
+Date : 25-April-2022 Until 30-April-2022
 
-> Trying New Feature. Wait Till Release.
+> Trying New Feature. Wait Till Release.  
 > I Think I Must Commit Daily. :3.
 
 List Addition / Changes :
 - Tying New Styling.
 - Test For New Story Formats.
 - Test For "How Big The Game Script This Tools Can Handle ?". I Think It's Based On Your Browser. But I Think It Can Handle A LOT.
+
+## 1.0.0
+Date : 30-April-2022
+
+> Big Changes. Finally, I Can Use This Tools To It's Full Potentials. :3.
+
+List Addition / Changes :
+- Few New Styling.
+- Now Support All Official Listed Story Formats On Twine 2. Such As Chapbook, Harlowe, Snowman, And Sugarcube.
+- Now Wrap Text Setting Already Made Globally.

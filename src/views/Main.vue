@@ -31,6 +31,7 @@ function createStory() {
       startNode : '1',
       userStyle : '/* Design Your Styling In Here */',
       userScript : '// Type Your Own Javascript In Here',
+      storyformats : 'sugarcube-2',
       passage : [
         {
           name : 'start',
@@ -203,10 +204,13 @@ function setIndex(val) {
       </div>
     </div>
     <div class="w-full text-xs grow overflow-auto" v-if="mode == 'about'">
-      <p class="p-1 mt-2">TweezeL Is A Free Tools For Creating Twine Games Focused For Android.</p>
+      <p class="p-1 mt-2">TweezeL Is A Free Tools For Creating Twine Games Focused For Android. But It Quite Works Well On Any Device With Browser On It. :3.</p>
       <p class="p-1 mt-2">The Feature Is Not Good Like Twine Or Tweego. But At Least It's Device Friendly Than Twine. And User Friendly Than Tweego. :)</p>
-      <p class="p-1 mt-2">For Now The Only And Default Story Formats Is Sugarcube v2.36.1 Story Formats.<br>
-        <a class="text-green-300 underline" href="http://www.motoslave.net/sugarcube/2/docs/" target="_blank" rel="noopener noreferrer">Go To Here</a> To Read It's Documentations For People Who Want To Do More In Their Story.</p>
+      <p class="p-1 mt-2">Now This Tools Already Support All Official Listed Story Formats On Twine 2 Tools. Such As Chapbook, Harlowe, Snowman, And Sugarcube.</p>
+      <p class="p-1 mt-2">If You Don't Know What To Choose For Your Game Story Formats. Just Create A New Story. Set The StoryFormats On The Story Global Setting.<br>
+        And Play The Story. Try All The StoryFormats One By One. Till U Find It Perfect For Your Game.<br>
+        Also. Every StoryFormats Has It's Own Documentations. If U Plan For Longer Gameplay For Your Game. Think About This StoryFormats Seriously. :3.<br>
+        My Personal Recomendations Is... <b>Sugarcube 2</b>...</p>
       <p class="p-1 mt-2">This Tools Is More Or Less Like Tweego But With GUI. For Those Who Never Code Twine Games With Tweego And Wanna Try This Tools.<br>
         Just Create A New Story To Read Some Very Basic Tutorial :).<br>
         Or <a class="text-green-300 underline" href="https://www.youtube.com/playlist?list=PLb4OE-UTEU-86vltmWTJTBkbYEWbGSebe" target="_blank" rel="noopener noreferrer">Go To Here.</a> It's My Youtube Playlist. Some Video About This Project. Like Basic Tutorial And Such Things.</p>

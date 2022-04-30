@@ -5,7 +5,6 @@ import { ref } from 'vue';
 //import router from '../router';
 const story = storyData()
 const route = useRoute()
-const isWrap = ref(true)
 const theStory = route.params
 const passageNames = ref(story.story[theStory.id].passage[theStory.pid].name)
 
@@ -27,13 +26,13 @@ function setTitle() {
       <button @click="setTitle" class="self-center rounded bg-green-300 text-black p-2">Set</button>
     </div>
     <div class="flex justify-start m-2 text-xs">
-      <button v-if="isWrap" @click="isWrap = false" class="flex flex-row rounded bg-green-300 text-black p-1">Wrap <svg class="h-4 w-4 self-center ml-1" viewBox="0 0 20 20" fill="currentColor">
+      <button v-if="story.isWrap" @click="story.isWrap = false" class="flex flex-row rounded bg-green-300 text-black p-1">Wrap <svg class="h-4 w-4 self-center ml-1" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
       </svg></button>
-      <button v-if="!isWrap" @click="isWrap = true" class="flex flex-row rounded bg-green-300 text-black p-1">Wrap <svg class="h-4 w-4 self-center ml-1" viewBox="0 0 20 20" fill="currentColor">
+      <button v-if="!story.isWrap" @click="story.isWrap = true" class="flex flex-row rounded bg-green-300 text-black p-1">Wrap <svg class="h-4 w-4 self-center ml-1" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
       </svg></button>
     </div>
-    <textarea type="textarea" v-model="story.story[theStory.id].passage[theStory.pid].data" :class="[isWrap ? 'whitespace-pre' : '', 'text-xs font-mono bg-transparent p-1 outline-none border rounded w-full resize-none grow']"></textarea>
+    <textarea type="textarea" v-model="story.story[theStory.id].passage[theStory.pid].data" :class="[story.isWrap ? 'whitespace-pre' : '', 'text-xs font-mono bg-transparent p-1 outline-none border rounded w-full resize-none grow']"></textarea>
   </div>
 </template>
