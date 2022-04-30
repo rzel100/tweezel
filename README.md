@@ -16,16 +16,16 @@ I'm Fan Of Text Based Games When I'm Still In High School. Back Then I Didn't Ha
 Looking Back RN I Still Trying To Code Some Text-Based Games On My Android. It's Doable, But I Want To Make It More Device-Friendly So I Can Share The Fun On Making Text Based Games To Other.
 
 ### Why Using TweezeL
-- Twine
-Twine Layout Is Not That Good For Phone.
-You Can Go Ahead To Twine Online Editor From Your Phone. The Layout Is Not Usable For Phone. You Can Enable Desktop Mode. But It Still Not Helping.
-TweezeL Feature May Not Good Like Twine.
+- Twine  
+Twine Layout Is Not That Good For Phone.  
+You Can Go Ahead To Twine Online Editor From Your Phone. The Layout Is Not Usable For Phone. You Can Enable Desktop Mode. But It Still Not Helping.  
+TweezeL Feature May Not Good Like Twine.  
 But In TweezeL. The Layout Is Good For Phone. I'm Not A Pro For Design Layout For Phone. But I Think It's Enough.
-- Tweego
-Tweego Is Like The Most Recomended Ways For Pro Dev On Creating Text Based Games.
-I Mean. If You Use Tweego On Your Phone To Create Text Based Game. You Already A Pro. Why, Cuz You Can Setup Termux, Etc.
-But It's Hard For Beginner. I Have Friends Who Interested In Text Based Games But Only Have Phone. I Suggest Him To Use Tweego And He Just Like "Na. I'll Back If I Have Laptop Or Pc"
-Again. TweezeL Feature May Not Good Like Tweego.
+- Tweego  
+Tweego Is Like The Most Recomended Ways For Pro Dev On Creating Text Based Games.  
+I Mean. If You Use Tweego On Your Phone To Create Text Based Game. You Already A Pro. Why, Cuz You Can Setup Termux, Etc.  
+But It's Hard For Beginner. I Have Friends Who Interested In Text Based Games But Only Have Phone. I Suggest Him To Use Tweego And He Just Like "Na. I'll Back If I Have Laptop Or Pc"  
+Again. TweezeL Feature May Not Good Like Tweego.  
 But In TweezeL. It's Beginner Friendly. I Mean, No Need For Setup. Just Go To The Browser, Go To TweezeL. And You Can Go Create Text-Based Games On Your Phone, Or Any Devices That Have Browser On It.
 
 ## TweezeL Feature
