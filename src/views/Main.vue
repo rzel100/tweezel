@@ -116,6 +116,13 @@ function download(filename, text) {
   element.click();
   document.body.removeChild(element);
 }
+function setIndex(val) {
+  if (isDelete.value == val) {
+    isDelete.value = '999999999'
+  } else {
+    isDelete.value = val
+  }
+}
 </script>
 
 <template>
@@ -134,7 +141,7 @@ function download(filename, text) {
         </svg>
       </button>
     </div>
-    <div class="w-full grow text-xs overflow-auto" v-if="mode == 'story'">
+    <div class="w-full grow text-xs overflow-auto flex flex-col" v-if="mode == 'story'">
       <div class="flex justify-center m-2 text-xs" v-if="!isNew">
         <div class="w-full p-1">Story List...</div>
         <button @click="isNew = true; storyName = ''; placeStoryName = 'Story Name...'" class="ml-2 whitespace-nowrap bg-green-300 text-black px-2 rounded">Create New Story</button>
@@ -161,21 +168,19 @@ function download(filename, text) {
             <router-link :to="`/story/${index}`" class="grow mx-2 py-2 truncate">
               <div>{{element.title}}</div>
             </router-link>
-            <div v-if="isDelete != index" class="flex mx-2">
-              <button @click="isDelete = index" class="bg-red-500 self-center rounded p-0.5">
-                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
-              </button>
-            </div>
-            <div v-else-if="isDelete == index" class="flex mx-2">
-              <div class="self-center text-xs mr-1"> Delete ?.</div>
-              <button @click="deleteStory(index)" class="bg-red-400 rounded self-center text-xs p-0.5 text-black">
-                Delete
-              </button>
-              <button @click="isDelete = '999999999'" class="bg-green-300 rounded self-center text-xs p-0.5 ml-1 text-black">
-                Cancel
-              </button>
+            <div class="flex mx-2">
+              <div class="relative inline-block self-center">
+                <button @click="setIndex(index)" :class="[isDelete == index ? 'rotate-90' : '', 'p-0.5 motion-safe:transition']">
+                  <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                  </svg>
+                </button>
+                <div :class="[isDelete == index ? 'block' : 'hidden', 'absolute right-0 z-10']">
+                  <button @click="deleteStory(index)" class="bg-red-400 self-center text-xs p-1 text-black shadow-2xl">
+                    Delete
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </template>

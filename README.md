@@ -8,13 +8,10 @@ Link Tools : https://tweezel.netlify.app
 For Now It Only For `Sugarcube v2` Story Formats. Will Support Other Formats In The Future.  
 (Story Formats That Listed On The Twine Apps).
 
-This Tools It's Still Prototype. It Works But Still Need A LOT Of Things To Be Done.
+I Think This Tools Already Usable. :3
 
 **If U Are Already Tried Build Games On Twine Or Tweego Using Sugarcube v2.  
 I Want U To Try Mine And Tell Me What Should I Add The Feature First.**
-
-If U Found Error When Play The Story. Try Restart The Sugarcube Engine.  
-I Want To Inject Auto-Restart Story Script To Fix This Issue But I Think That's Wrong.
 
 <hr>
 
