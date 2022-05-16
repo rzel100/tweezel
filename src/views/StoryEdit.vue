@@ -7,12 +7,25 @@ const story = storyData()
 const route = useRoute()
 const theStory = route.params
 const passageNames = ref(story.story[theStory.id].passage[theStory.pid].name)
+const truePassageNames = passageNames.value
+const dataName = ref(story.story[theStory.id].passage)
 
-function setTitle() {
-  if (passageNames.value) {
-    story.story[theStory.id].passage[theStory.pid].name = passageNames.value
+let nameList = dataName.value.map(function(data){
+  return data.name
+})
+
+function setName(name) {
+  let hasilnya = 0
+  nameList.forEach(function(data){
+    if (data == name) {
+      hasilnya += 1
+    }
+  })
+  if (hasilnya == 0) {
+    story.story[theStory.id].passage[theStory.pid].name = name
   }
 }
+
 </script>
 
 <template>
@@ -22,8 +35,7 @@ function setTitle() {
     </div>
     <div class="flex justify-center m-2 text-xs">
       <p class="self-center text-center">Passage Names</p>
-      <input type="text" placeholder="Passage Title Must Not Empty" v-model="passageNames" class="font-mono bg-transparent p-1 outline-none border rounded w-full placeholder:italic placeholder:text-slate-300"/>
-      <button @click="setTitle" class="self-center rounded bg-green-300 text-black p-2">Set</button>
+      <input @change="setName(truePassageNames)" type="text" placeholder="Passage Title Must Not Empty" v-model="truePassageNames" class="font-mono bg-transparent p-1 outline-none border rounded w-full placeholder:italic placeholder:text-slate-300"/>
     </div>
     <div class="flex justify-start m-2 text-xs">
       <button v-if="story.isWrap" @click="story.isWrap = false" class="flex flex-row rounded bg-green-300 text-black p-1">Wrap <svg class="h-4 w-4 self-center ml-1" viewBox="0 0 20 20" fill="currentColor">

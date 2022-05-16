@@ -7,6 +7,24 @@ const route = useRoute()
 const mode = ref('setting')
 const theStory = route.params
 const storyNames = ref(story.story[theStory.id].title)
+const trueStoryNames = storyNames.value
+const dataName = ref(story.story)
+
+let nameList = dataName.value.map(function(data){
+  return data.title
+})
+
+function setName(name) {
+  let hasilnya = 0
+  nameList.forEach(function(data){
+    if (data == name) {
+      hasilnya += 1
+    }
+  })
+  if (hasilnya == 0) {
+    story.story[theStory.id].title = name
+  }
+}
 
 function download(filename, text) {
     var element = document.createElement('a');
@@ -71,8 +89,7 @@ const listStoryFormats = ref([
     <div class="p-1 w-full grow text-xs overflow-auto" v-if="mode == 'setting'">
       <p class="p-1">Story Title</p>
       <div class="flex justify-center text-xs">
-        <input type="text" placeholder="Story Title Must Not Empty" v-model="storyNames" class="font-mono bg-transparent p-1 outline-none border rounded w-full placeholder:italic placeholder:text-slate-300"/>
-        <button @click="setTitle" class="self-center rounded bg-green-300 text-black p-2">Set</button>
+        <input @change="setName(trueStoryNames)" type="text" placeholder="Story Title Must Not Empty" v-model="trueStoryNames" class="font-mono bg-transparent p-1 outline-none border rounded w-full placeholder:italic placeholder:text-slate-300"/>
       </div>
       <p class="p-1 mt-2">Story Formats</p>
       <select v-model="story.story[theStory.id].storyformats" class="font-mono bg-transparent p-1 outline-none border rounded w-full">

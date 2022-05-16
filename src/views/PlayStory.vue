@@ -30,7 +30,7 @@ function createTheStory(data) {
     passageDataNyaTmp = '<tw-passagedata pid="'+story.story[theStory].passage[i].pid+'" name="'+story.story[theStory].passage[i].name+'" tags="" position="100,100" size="100,100">'+dataTmpHtmlSafe+'</tw-passagedata>'
     passageDataNya = passageDataNya + passageDataNyaTmp
   }
-  let realData = data.replace(/tweezelStoryTitle/g, story.story[theStory].title).replace(/tweezelStoryIfid/g, story.story[theStory].ifid).replace(/tweezelStoryStartNode/g, story.story[theStory].startNode).replace(/tweezelStoryUserStyle/g, story.story[theStory].userStyle).replace(/tweezelStoryUserScript/g, story.story[theStory].userScript).replace(/tweezelStoryPassage/g, passageDataNya).replace(/tweezelVersion/g, '1.0.0')
+  let realData = data.replace(/tweezelStoryTitle/g, story.story[theStory].title).replace(/tweezelStoryIfid/g, story.story[theStory].ifid).replace(/tweezelStoryStartNode/g, story.story[theStory].startNode).replace(/tweezelStoryUserStyle/g, story.story[theStory].userStyle).replace(/tweezelStoryUserScript/g, story.story[theStory].userScript).replace(/tweezelStoryPassage/g, passageDataNya).replace(/tweezelVersion/g, '1.0.1')
   gameCode.value = realData
 }
 if (story.story[theStory].passage.length == 0) {

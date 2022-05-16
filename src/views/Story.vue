@@ -105,7 +105,7 @@ function setIndex(val) {
         item-key="pid"
       >
         <template #item="{element, index}">
-          <div class="flex motion-safe:hover:bg-black/20 motion-safe:transition">
+          <div class="flex hover:bg-black/20 transition">
             <div class="handle self-center pl-1">
               <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
@@ -116,7 +116,7 @@ function setIndex(val) {
             </router-link>
             <div class="flex mx-2">
               <div class="relative inline-block self-center">
-                <button @click="setIndex(index)" :class="[isDelete == index ? 'rotate-90' : '', 'p-0.5 motion-safe:transition']">
+                <button @click="setIndex(index)" :class="[isDelete == index ? 'rotate-90' : '', 'p-0.5 transition']">
                   <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                   </svg>

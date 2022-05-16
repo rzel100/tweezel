@@ -67,3 +67,13 @@ List Addition / Changes :
 - Few New Styling.
 - Now Support All Official Listed Story Formats On Twine 2. Such As Chapbook, Harlowe, Snowman, And Sugarcube.
 - Now Wrap Text Setting Already Made Globally.
+
+## 1.0.1
+Date : 16-May-2022
+
+> Small Changes.
+
+List Addition / Changes :
+- Few Fix Styling
+- Edit Passage Names And Story Title Now No Need To Press The "Set" Button.
+- Preparing For Exporting To .apk
