@@ -2,13 +2,18 @@
 import { useRoute } from 'vue-router'
 import { storyData } from '@/stores/story'
 import { ref } from 'vue';
-//import router from '../router';
+import { createToaster } from "@meforma/vue-toaster";
 const story = storyData()
 const route = useRoute()
 const theStory = route.params
 const passageNames = ref(story.story[theStory.id].passage[theStory.pid].name)
-const truePassageNames = passageNames.value
+const truePassageNames = ref(passageNames.value)
 const dataName = ref(story.story[theStory.id].passage)
+const toaster = createToaster({
+  position : 'top',
+  duration : 2000,
+  dismissible : true
+});
 
 let nameList = dataName.value.map(function(data){
   return data.name
@@ -23,6 +28,11 @@ function setName(name) {
   })
   if (hasilnya == 0) {
     story.story[theStory.id].passage[theStory.pid].name = name
+    toaster.show(`Success Changing Passage Name...`, {type : 'success'})
+    passageNames.value = name
+    truePassageNames.value = name
+  } else {
+    toaster.show(`Passage Name Is Alreadys Exist Or Empty...`, {type : 'error'})
   }
 }
 
@@ -30,21 +40,38 @@ function setName(name) {
 
 <template>
   <div class="h-screen flex flex-col">
-    <div class="flex bg-black/25">
-      <p class="text-xl grow self-center p-1">Editing Passage</p>
+
+    <div class="navbar bg-primary shadow-lg">
+      <button tabindex="0" class="btn btn-ghost btn-square" @click='$router.back()'>
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 self-center m-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75" />
+        </svg>
+      </button>
+      <div class='grow truncate'>
+        <button class="btn btn-ghost normal-case px-0 text-xl m-1">Editing Passage</button>
+      </div>
     </div>
-    <div class="flex justify-center m-2 text-xs">
-      <p class="self-center text-center">Passage Names</p>
-      <input @change="setName(truePassageNames)" type="text" placeholder="Passage Title Must Not Empty" v-model="truePassageNames" class="font-mono bg-transparent p-1 outline-none border rounded w-full placeholder:italic placeholder:text-slate-300"/>
+
+    <div class='w-full px-2 pb-2 flex flex-col h-full'>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Passage Names</span>
+        </label>
+        <label class="input-group input-group-xs w-full">
+          <input v-model="truePassageNames" type="text" placeholder="Passage Title Must Not Empty" class="input input-bordered input-xs grow" />
+          <span v-if="passageNames != truePassageNames" @click="setName(truePassageNames)" class='cursor-pointer'>
+            <span>Set</span>
+          </span>
+        </label>
+      </div>
+      <div class="form-control">
+        <label class="label cursor-pointer justify-start gap-2">
+          <input @click="story.isWrap = !story.isWrap" type="checkbox" class="toggle toggle-primary" :checked='!story.isWrap' />
+          <span class="label-text">Wrap</span> 
+        </label>
+      </div>
+      <textarea type="textarea" v-model="story.story[theStory.id].passage[theStory.pid].data" :class="[story.isWrap ? 'whitespace-pre' : '', 'text-xs font-mono textarea textarea-bordered resize-none grow w-full h-full px-1']"></textarea>
     </div>
-    <div class="flex justify-start m-2 text-xs">
-      <button v-if="story.isWrap" @click="story.isWrap = false" class="flex flex-row rounded bg-green-300 text-black p-1">Wrap <svg class="h-4 w-4 self-center ml-1" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-      </svg></button>
-      <button v-if="!story.isWrap" @click="story.isWrap = true" class="flex flex-row rounded bg-green-300 text-black p-1">Wrap <svg class="h-4 w-4 self-center ml-1" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-      </svg></button>
-    </div>
-    <textarea type="textarea" v-model="story.story[theStory.id].passage[theStory.pid].data" :class="[story.isWrap ? 'whitespace-pre' : '', 'text-xs font-mono bg-transparent p-1 outline-none border rounded w-full resize-none grow']"></textarea>
+
   </div>
 </template>

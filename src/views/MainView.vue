@@ -1,0 +1,276 @@
+<script setup>
+import { ref, computed } from 'vue'
+import { RouterLink } from 'vue-router'
+import draggable from 'vuedraggable'
+import { createToaster } from "@meforma/vue-toaster";
+import { storyData } from '@/stores/story'
+const story = storyData()
+const storyName = ref('')
+const isNew = ref(false)
+const mode = ref('story')
+const storyList = ref(story.story)
+const loadStory = ref(null)
+const loadWholeStory = ref(null)
+const installPromptMain = ref(null)
+const toaster = createToaster({
+  position : 'top',
+  duration : 2000,
+  dismissible : true
+});
+let search = ref('')
+
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  installPromptMain.value = e;
+});
+
+window.addEventListener("appinstalled", () => {
+  installPromptMain.value = null;
+});
+
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+
+function generateIFID() {
+  return uuidv4().toString().toUpperCase()
+}
+
+function createStory() {
+  if (storyName.value.length < 1) {
+    toaster.show(`Story Name Is Required...`, {type : 'error'})
+  } else {
+    let ifid = generateIFID()
+    let newStory = {
+      title : storyName.value,
+      ifid : ifid,
+      startNode : '1',
+      userStyle : '/* Design Your Styling In Here */',
+      userScript : '// Type Your Own Javascript In Here',
+      storyformats : 'sugarcube-2',
+      passage : [
+        {
+          name : 'start',
+          pid : '1',
+          data : `This Is Your Start Passage.
+Quick Tips.
+To Add Link / Ways To Other Passage Use
+[[about]] <- This Display "about", When Clicked Go To "about" Passage.
+[[This Is About|about]] <- This Display "This Is About", When Clicked Go To "about" Passage.`
+        },
+        {
+          name : 'about',
+          pid : '2',
+          data : `This Is Your About Passage
+Try To Link From Here To "start" Just Use Like In The [[start]] Passage.
+Beware Of Passage Link That Leads To Nowhere !. Like This -> [[pit]] Or [[Go To Pit|pit]].
+To Fix That, Try To Add A New Passage And Name It "pit".`
+        }
+      ]
+    }
+    story.story.push(newStory)
+    isNew.value = false
+    storyName.value = ''
+  }
+}
+
+function deleteStory(index) {
+  story.story = storyList.value.filter((onePassage) =>
+    onePassage.ifid !== index
+  )
+  storyList.value = story.story
+}
+
+function checkLegit(data) {
+  let legit = false
+  if (data.title && data.ifid && data.startNode && data.passage) {
+    legit = true
+  }
+  return legit
+}
+
+function readData() {
+  let file_to_read = document.getElementById("jsonfileinput").files[0]
+  if (file_to_read != undefined) {
+    let fileread = new FileReader()
+    fileread.onload = function(e) {
+      let content = e.target.result
+      let storyData = JSON.parse(content)
+      if (checkLegit(storyData)) {
+        story.story.push(storyData)
+      }
+      mode.value = 'story'
+    }
+    fileread.readAsText(file_to_read)
+  }
+}
+
+function readWholeData() {
+  let file_to_read = document.getElementById("jsonwholestoryfileinput").files[0]
+  if (file_to_read != undefined) {
+    let fileread = new FileReader()
+    fileread.onload = function(e) {
+      let content = e.target.result
+      let storyData = JSON.parse(content)
+      if (storyData.length > 0) {
+        for (let i = 0;i < storyData.length;i++) {
+          if (checkLegit(storyData[i])) {
+            story.story.push(storyData[i])
+          }
+        }
+      }
+      mode.value = 'story'
+    }
+    fileread.readAsText(file_to_read)
+  }
+}
+
+function download(filename, text) {
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const d = new Date();
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename+' '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+'.tweezeldata');
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
+
+let filteredStory = computed(() =>
+  search.value === ''
+    ? storyList.value
+    : storyList.value.filter((oneStory) =>
+      oneStory.title
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .includes(search.value.toLowerCase().replace(/\s+/g, ''))
+      )
+)
+</script>
+
+<template>
+  <div class="flex flex-col h-screen">
+    <div class="navbar bg-primary shadow-lg">
+      <div class='flex-1'>
+        <button class="btn btn-ghost normal-case text-xl">TweezeL</button>
+      </div>
+      <div class="dropdown dropdown-end">
+        <label tabindex="0" class="btn btn-ghost btn-square m-1">
+          <svg fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+        </label>
+        <ul tabindex="0" class="dropdown-content menu p-2 rounded-box shadow-xl bg-primary mt-4">
+          <li><label for="setting-modal">Setting</label></li>
+          <li><label for="about-modal">About</label></li>
+          <li v-if="installPromptMain"><label @click="installPromptMain.prompt()">Install</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="form-control p-2">
+      <label class="input-group input-group-xs w-full">
+        <input v-model="search" type="text" placeholder="Search" class="input input-bordered input-xs grow" />
+        <span @click="search = ''" class='cursor-pointer'>
+          <svg v-if="search.length > 0" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          <svg v-else class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        </span>
+      </label>
+    </div>
+    
+    <div class="w-full grow p-2 overflow-auto flex flex-col">
+      <div class="grow overflow-auto pb-[69px]">
+        <template v-if='filteredStory.length > 0'>
+          <draggable
+            :list="filteredStory"
+            handle=".handle"
+            item-key="title"
+          >
+            <template #item="{element, index}">
+              <div class='relative flex items-center transition-all hover:bg-black/20'>
+                <div v-if="search.length == 0" class="handle absolute left-3 cursor-move">
+                  <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="flex absolute right-3">
+                  <div class="dropdown dropdown-end">
+                    <label tabindex="0" class="btn btn-ghost btn-sm">
+                      <svg fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+                    </label>
+                    <ul tabindex="0" class="dropdown-content menu menu-compact p-2 bg-base-100 rounded-box shadow-xl">
+                      <li>
+                        <button @click="deleteStory(element.ifid)" class='bg-error'>
+                          Delete
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <router-link :to="`/story/${index}`" class="py-4 static w-full px-12 truncate">
+                  {{element.title}}
+                </router-link>
+              </div>
+            </template>
+          </draggable>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <label for='create-modal' class="btn btn-primary btn-circle absolute bottom-5 right-5 cursor-pointer">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+  </label>
+
+  <input type="checkbox" id="create-modal" class="modal-toggle" />
+  <div class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box relative">
+      <label for="create-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
+      <h3 class="font-bold text-lg mb-4">Write An Amazing Title For Your Story...</h3>
+      <input v-model="storyName" type="text" placeholder="Story Title" class="input input-bordered w-full" />
+      <div class="modal-action">
+        <label @click="createStory()" for="create-modal" class="btn btn-success">Start Creating !.</label>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="setting-modal" class="modal-toggle" />
+  <div class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box relative">
+      <label for="setting-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
+      <p class='text-xl py-2'>Load Story From Backup.</p>
+      <button @click='loadStory.click()' class='btn btn-primary btn-block btn-sm'>Choose Story Backup To Load.</button>
+      <input @change='readData' class="h-0 w-0" type="file" id="jsonfileinput" ref='loadStory' accept='.tweezeldata' />
+
+      <div class='divider'>OR</div>
+
+      <p class='text-xl py-2'>Create Backup Of An Entire Story.</p>
+      <button @click="download('TweezeL Backup', JSON.stringify(story.story))" class='btn btn-primary btn-block btn-sm'>Backup The Entire Story.</button>
+
+      <p class='text-xl py-2'>Load Entire Story From Backup.</p>
+      <button @click='loadWholeStory.click()' class='btn btn-primary btn-block btn-sm'>Choose Whole Story Backup To Load.</button>
+      <input @change='readWholeData' class="h-0 w-0" type="file" id="jsonwholestoryfileinput" ref='loadWholeStory' accept='.tweezeldata' />
+    </div>
+  </div>
+
+  <input type="checkbox" id="about-modal" class="modal-toggle" />
+  <div class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box relative">
+      <label for="about-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
+      <p class="p-1 mt-2">TweezeL Is A Free Tools For Creating Twine Games Focused For Android. But It Quite Works Well On Any Device With Browser On It. :3.</p>
+      <p class="p-1 mt-2">The Feature Is Not Good Like Twine Or Tweego. But At Least It's Device Friendly Than Twine. And User Friendly Than Tweego. :)</p>
+      <p class="p-1 mt-2">Now This Tools Already Support All Official Listed Story Formats On Twine 2 Tools. Such As Chapbook, Harlowe, Snowman, And Sugarcube.</p>
+      <p class="p-1 mt-2">If You Don't Know What To Choose For Your Game Story Formats. Just Create A New Story. Set The StoryFormats On The Story Global Setting.<br>
+        And Play The Story. Try All The StoryFormats One By One. Till U Find It Perfect For Your Game.<br>
+        Also. Every StoryFormats Has It's Own Documentations. If U Plan For Longer Gameplay For Your Game. Think About This StoryFormats Seriously. :3.<br>
+        My Personal Recomendations Is... <b>Sugarcube 2</b>...</p>
+      <p class="p-1 mt-2">This Tools Is More Or Less Like Tweego But With GUI. For Those Who Never Code Twine Games With Tweego And Wanna Try This Tools.<br>
+        Just Create A New Story To Read Some Very Basic Tutorial :).<br>
+        Or <a class="text-primary-content underline" href="https://www.youtube.com/playlist?list=PLb4OE-UTEU-86vltmWTJTBkbYEWbGSebe" target="_blank" rel="noopener noreferrer">Go To Here.</a> It's My Youtube Playlist. Some Video About This Project. Like Basic Tutorial And Such Things.</p>
+      <label for="about-modal" class="btn btn-success btn-block btn-sm mt-2">Happy Creating !.</label>
+    </div>
+  </div>
+</template>

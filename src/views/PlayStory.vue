@@ -1,7 +1,6 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { storyData } from '@/stores/story'
-import router from '../router';
 import { ref } from 'vue';
 const story = storyData()
 const route = useRoute()
@@ -30,16 +29,14 @@ function createTheStory(data) {
     passageDataNyaTmp = '<tw-passagedata pid="'+story.story[theStory].passage[i].pid+'" name="'+story.story[theStory].passage[i].name+'" tags="" position="100,100" size="100,100">'+dataTmpHtmlSafe+'</tw-passagedata>'
     passageDataNya = passageDataNya + passageDataNyaTmp
   }
-  let realData = data.replace(/tweezelStoryTitle/g, story.story[theStory].title).replace(/tweezelStoryIfid/g, story.story[theStory].ifid).replace(/tweezelStoryStartNode/g, story.story[theStory].startNode).replace(/tweezelStoryUserStyle/g, story.story[theStory].userStyle).replace(/tweezelStoryUserScript/g, story.story[theStory].userScript).replace(/tweezelStoryPassage/g, passageDataNya).replace(/tweezelVersion/g, '1.0.1')
+  let realData = data.replace(/tweezelStoryTitle/g, story.story[theStory].title).replace(/tweezelStoryIfid/g, story.story[theStory].ifid).replace(/tweezelStoryStartNode/g, story.story[theStory].startNode).replace(/tweezelStoryUserStyle/g, story.story[theStory].userStyle).replace(/tweezelStoryUserScript/g, story.story[theStory].userScript).replace(/tweezelStoryPassage/g, passageDataNya).replace(/tweezelVersion/g, '1.1.0')
   gameCode.value = realData
 }
 if (story.story[theStory].passage.length == 0) {
   errornya.value.push('No Passage To Play With. Add Some Passage First.')
-  //router.back()
 }
 if (!story.story[theStory].storyformats) {
   errornya.value.push('Story Formats Is Not Set. Set First In Global Story Setting.')
-  //router.back()
 }
 
 if (story.story[theStory].storyformats == 'chapbook-1') {
@@ -94,6 +91,11 @@ if (story.story[theStory].storyformats == 'chapbook-1') {
 
 function gameReady() {
   isLoading.value = false
+  if (story.playState == 'play') {
+    play.value = true
+  } else {
+    exportHTML()
+  }
 }
 function exportHTML() {
   let element = document.createElement('a');
@@ -108,24 +110,57 @@ function exportHTML() {
 
 <template>
   <div class="flex h-screen overflow-auto flex-col">
+
     <div v-if="errornya.length > 0" class="p-2">
       There Is Some Error In Your Story. Here Is The Error(s) :
-      <div v-for="data, index in errornya">
+      <div v-for="data, index in errornya" :key='index'>
         {{index + 1}}. {{data}}
       </div>
     </div>
+
     <div v-else class="grow flex flex-col">
-      <div v-show="play" class="grow flex bg-white">
+
+      <div v-show="play" class="grow flex flex-col bg-white relative">
+        <div class='absolute bottom-0 left-0'>
+          <label for="close-modal" tabindex="0" class="btn btn-ghost btn-square btn-xs bg-black/20">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 text-white">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </label>
+        </div>
         <iframe id="storyWindow" class="grow" :srcdoc="gameCode" @load="gameReady()"></iframe>
       </div>
+
       <div v-show="!play" class="grow flex flex-col">
-        <p class="grow-0 p-2 border-b-2 bg-black/20">Play Story</p>
-        <div v-if="isLoading">Loading The Game... Please Wait A Bit...</div>
-        <div class="grow flex flex-col m-5 gap-5 text-black" v-else>
-          <button @click="play = true" class="bg-green-300 p-2 rounded">Play The Story</button>
-          <button @click="exportHTML()" class="bg-red-300 p-2 rounded">Export The Story</button>
+        <div class="navbar bg-primary shadow-lg">
+          <button tabindex="0" class="btn btn-ghost btn-square" @click='$router.back()'>
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 self-center m-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75" />
+            </svg>
+          </button>
+          <div class='grow truncate'>
+            <div class="normal-case text-xl truncate px-0 font-semibold">Play Story</div>
+          </div>
+        </div>
+        <div class='p-1' v-if="isLoading">Loading The Game... Please Wait A Bit...</div>
+        <div class='p-1' v-else>
+          Export Completed...
+        </div>
+      </div>
+
+    </div>
+
+    <input type="checkbox" id="close-modal" class="modal-toggle" />
+    <div class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box relative">
+        <label for="close-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
+        <h3 class="font-bold text-lg mb-4">Quit Preview...???</h3>
+        <div class="modal-action">
+          <label for="close-modal" class="btn btn-ghost">No.</label>
+          <label @click="$router.back()" for="create-modal" class="btn btn-success">Yes.</label>
         </div>
       </div>
     </div>
+
   </div>
 </template>
