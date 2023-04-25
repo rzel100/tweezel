@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with Vectornator (http://vectornator.io/) -->
+<svg height="100%" stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;" version="1.1" viewBox="0 0 1024 1024" width="100%" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:vectornator="http://vectornator.io" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<linearGradient gradientTransform="matrix(1 0 0 1 0 0)" gradientUnits="userSpaceOnUse" id="LinearGradient" x1="563.631" x2="460.468" y1="451.071" y2="440.455">
+<stop offset="0" stop-color="#cc4029"/>
+<stop offset="0" stop-color="#1980d0"/>
+<stop offset="1" stop-color="#000000"/>
+</linearGradient>
+<linearGradient gradientTransform="matrix(1 0 0 1 0 0)" gradientUnits="userSpaceOnUse" id="LinearGradient_2" x1="655.893" x2="823.641" y1="313.54" y2="546.499">
+<stop offset="0" stop-color="#acd4f1"/>
+<stop offset="1" stop-color="#043558"/>
+</linearGradient>
+</defs>
+<g id="Layer-1" vectornator:layerName="Layer 1" visibility="hidden"/>
+<g id="Layer-3" vectornator:layerName="Layer 3"/>
+<g id="Layer-5" opacity="0.5" vectornator:layerName="Layer 5"/>
+<g id="Layer-2" vectornator:layerName="Layer 2"/>
+<g id="Layer-7" vectornator:layerName="Layer 7">
+<path d="M480.928 404.724C480.928 404.724 476.082 366.439 475.384 348.002C474.466 323.766 491.574 312.487 509.205 310.615C525.106 308.926 540.265 319.153 545.877 328.26C552.809 339.508 551.62 367.715 551.62 367.715L563.564 612.03C563.564 612.03 564.367 632.515 572.628 642.803C586.082 659.558 601.962 676.679 610.121 685.336C614.461 689.94 636.242 710.297 630.469 717.332C627.128 721.403 619.183 719.148 619.183 719.148C619.183 719.148 557.455 685.887 530.877 670.804C504.299 655.721 508.456 634.886 508.456 634.886L508.456 634.886L484.189 432.359L484.189 432.359" fill="url(#LinearGradient)" fill-rule="nonzero" opacity="1" stroke="none"/>
+<g opacity="1">
+<path d="M787.227 307.667C787.227 307.667 796.892 256.262 731.815 225.865C666.738 195.469 601.661 200.833 601.661 200.833L586.197 480.212L749.438 433.64L787.227 307.667Z" fill="url(#LinearGradient_2)" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M228.977 579.497C228.977 579.497 566.485 444.974 705.503 388.714C792.173 353.64 786.597 295.842 786.597 295.842L786.865 724.348C786.865 724.348 790.791 765.47 758.618 797.438C726.446 829.406 593.203 909.318 593.203 909.318L228.977 579.497Z" fill="#b5e9ff" fill-rule="nonzero" opacity="1" stroke="none"/>
+</g>
+</g>
+<g id="Layer-6" vectornator:layerName="Layer 6">
+<g opacity="1">
+<path d="M452.775 409.469C452.775 409.469 455.161 366.828 458.257 346.553C462.328 319.899 485.099 310.264 506.489 311.001C525.78 311.665 541.649 325.245 546.391 336.093C552.248 349.49 544.824 380.155 544.824 380.155L506.999 649.268C506.999 649.268 503.591 671.801 511.235 684.359C523.683 704.809 538.942 726.044 546.812 736.802C550.998 742.523 572.594 768.229 564.222 775.012C559.377 778.938 550.398 775.216 550.398 775.216C550.398 775.216 483.992 729.086 455.562 708.391C427.132 687.696 436.519 665.563 436.519 665.563L436.519 665.563L450.771 440.211L450.771 440.211" fill="#1975bd" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M311.374 266.637L704.125 266.637C715.673 266.637 725.035 276.289 725.035 288.196L725.035 346.707C725.035 358.614 715.673 368.266 704.125 368.266L311.374 368.266C299.826 368.266 290.464 358.614 290.464 346.707L290.464 288.196C290.464 276.289 299.826 266.637 311.374 266.637Z" fill="#1975bd" fill-rule="nonzero" opacity="1" stroke="none"/>
+</g>
+</g>
+</svg>

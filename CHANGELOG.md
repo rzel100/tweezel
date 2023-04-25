@@ -109,3 +109,35 @@ List Addition / Changes :
 - Edit Passage Names Now Need To Press The "Set" Button.
 - Upgrade The Version Of Vue.
 - Now This App Is A PWA !. U Can Install This App To Ur Device If You Open This App With Chrome Browser !. So U Can Use This App Without Internet !.
+
+## 1.1.1
+
+Date : 5-Feb-2023
+
+> Small Changes.  
+> Just A Find A Way To Make Apk. Ima Try It.
+
+List Addition / Changes :
+
+- Change `h-screen` class To `window.innerHeight`.
+- Change The Icon Created By My Friend. Thanks Brother !.
+- Preparing For Exporting To .apk
+
+## 1.2.0
+
+Date : 24-Apr-2023
+
+> Major Changes.  
+> Adding Much Theme Thanks To Daisy UI.  
+> And Now It Has LocalStorage Meter. So U Know How Much Data On TweezeL.
+
+List Addition / Changes :
+
+- Added Theme. Many Themes. Check Them Out !.
+- Added LocalStorage Meter.
+- Learn To Component Some Things. I'll Deal With The Rest Later.
+- Change The URL Structure. Now With IFID Instead Of Index. And With PID Instead Of Index.
+- Fixing When U Search For Story Or Passage. Sometimes It's Not On The Correct Story Or Passage.
+- Fixing Export Sometimes Output 2 Files. 1 Of Them Has 0 Size.
+- Fixing Rezise Sometimes Not Responsive.
+- Fixing Css And Some Code.

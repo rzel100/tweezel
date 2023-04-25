@@ -9,7 +9,10 @@ const story = storyData()
 const route = useRoute()
 const isNew = ref(false)
 const passageName = ref('')
-const theStory = route.params.id
+const groupName = ref('')
+const theIfid = route.params.id
+const findIfid = (element) => element.ifid == theIfid;
+const theStory = story.story.findIndex(findIfid)
 const passageList = ref(story.story[theStory].passage)
 const toaster = createToaster({
   position : 'top',
@@ -17,6 +20,7 @@ const toaster = createToaster({
   dismissible : true
 });
 let search = ref('')
+let grouping = ref('')
 story.storyId = theStory
 
 function sameName(data) {
@@ -79,9 +83,9 @@ let filteredPassage = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col h-screen">
+  <div class="flex flex-col h-screen" :style='{height: story.innerHeight + "px"}'>
     
-    <div class="navbar bg-primary shadow-lg">
+    <div class="navbar bg-primary shadow-lg text-primary-content">
       <button tabindex="0" class="btn btn-ghost btn-square" @click='$router.back()'>
         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 self-center m-2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75" />
@@ -90,7 +94,7 @@ let filteredPassage = computed(() =>
       <div class='grow truncate'>
         <div class="normal-case text-xl truncate font-semibold">{{story.story[theStory].title}}</div>
       </div>
-      <router-link :to="`/story/${theStory}/global`">
+      <router-link :to="`/story/${theIfid}/global`">
         <button tabindex="0" class="btn btn-ghost btn-square m-1">
           <svg class="h-5 w-5 self-center m-2" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
@@ -131,14 +135,14 @@ let filteredPassage = computed(() =>
                     </label>
                     <ul tabindex="0" class="dropdown-content menu menu-compact p-2 bg-base-100 rounded-box shadow-xl">
                       <li>
-                        <button @click="deletePassage(element.pid)" class='bg-error'>
+                        <button @click="deletePassage(element.pid)" class='bg-error text-error-content'>
                           Delete
                         </button>
                       </li>
                     </ul>
                   </div>
                 </div>
-                <router-link :to="`/story/${theStory}/edit/${index}`" class="py-4 static w-full px-12 truncate">
+                <router-link :to="`/story/${story.story[theStory].ifid}/edit/${element.pid}`" class="py-4 static w-full px-12 truncate">
                   {{element.name}}
                 </router-link>
               </div>
@@ -150,7 +154,7 @@ let filteredPassage = computed(() =>
   </div>
 
   <div class="absolute bottom-5 right-5 flex flex-row gap-5">
-    <router-link :to="`/story/${theStory}/play`">
+    <router-link :to="`/story/${theIfid}/play`">
       <button class="btn btn-primary btn-circle cursor-pointer" @click='story.playState = "export"'>
         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 13.5l3 3m0 0l3-3m-3 3v-6m1.06-4.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
@@ -158,7 +162,7 @@ let filteredPassage = computed(() =>
       </button>
     </router-link>
 
-    <router-link :to="`/story/${theStory}/play`">
+    <router-link :to="`/story/${theIfid}/play`">
       <button class="btn btn-primary btn-circle cursor-pointer" @click='story.playState = "play"'>
         <svg class="h-6 w-6 self-center m-2" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />

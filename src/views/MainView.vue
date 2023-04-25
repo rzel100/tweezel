@@ -4,11 +4,15 @@ import { RouterLink } from 'vue-router'
 import draggable from 'vuedraggable'
 import { createToaster } from "@meforma/vue-toaster";
 import { storyData } from '@/stores/story'
+import { StorageDetail } from '@/components/medium/index.vue';
+import { ModalComponent } from '@/components/small/index.vue';
 const story = storyData()
 const storyName = ref('')
 const isNew = ref(false)
 const mode = ref('story')
 const storyList = ref(story.story)
+const themeList = ref(story.themeList)
+const storageStatus = ref(false)
 const loadStory = ref(null)
 const loadWholeStory = ref(null)
 const installPromptMain = ref(null)
@@ -19,6 +23,8 @@ const toaster = createToaster({
 });
 let search = ref('')
 
+story.groupState = ""
+
 window.addEventListener("beforeinstallprompt", e => {
   e.preventDefault();
   installPromptMain.value = e;
@@ -27,6 +33,22 @@ window.addEventListener("beforeinstallprompt", e => {
 window.addEventListener("appinstalled", () => {
   installPromptMain.value = null;
 });
+
+function refreshStory() {
+  story.themeList = [
+    "garden",
+    "business",
+    "wireframe",
+    "black",
+    "valentine",
+    "retro",
+    "fantasy",
+    "pastel",
+    "autumn",
+    "winter",
+  ]
+  toaster.show(`Refresh The App To See The Changes...`, {type : 'success'})
+}
 
 function uuidv4() {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -127,6 +149,10 @@ function readWholeData() {
   }
 }
 
+function changeTheme(data) {
+  story.theme = data.target.value
+}
+
 function download(filename, text) {
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const d = new Date();
@@ -138,6 +164,67 @@ function download(filename, text) {
   element.click();
   document.body.removeChild(element);
 }
+
+/* Check The LocalStorage... */
+function getUsedSpaceOfLocalStorageInBytes() {
+    // Returns the total number of used space (in Bytes) of the Local Storage
+    var b = 0;
+    for (var key in window.localStorage) {
+        // eslint-disable-next-line no-prototype-builtins
+        if (window.localStorage.hasOwnProperty(key)) {
+            b += key.length + localStorage.getItem(key).length;
+        }
+    }
+    return b;
+}
+
+function getUnusedSpaceOfLocalStorageInBytes() {
+  var maxByteSize = 10485760; // 10MB
+  var minByteSize = 0;
+  var tryByteSize = 0;
+  var testQuotaKey = 'testQuota';
+  var timeout = 20000;
+  var startTime = new Date().getTime();
+  var unusedSpace = 0;
+  let runtime = 0
+  do {
+    runtime = new Date().getTime() - startTime;
+    try {
+      tryByteSize = Math.floor((maxByteSize + minByteSize) / 2);
+      //localStorage.setItem(testQuotaKey, new Array(tryByteSize).join('1'));
+      
+      //Recommended by @pkExec and @jrob007
+      localStorage.setItem(testQuotaKey, String('1').repeat(tryByteSize));
+      minByteSize = tryByteSize;
+    } catch (e) {
+      maxByteSize = tryByteSize - 1;
+    }
+  } while ((maxByteSize - minByteSize > 1) && runtime < timeout);
+
+  localStorage.removeItem(testQuotaKey);
+
+  storageStatus.value = false
+
+  if (runtime >= timeout) {
+    console.log("Unused Space Calculation May Be Off Due To Timeout.");
+  }
+
+  // Compensate for the byte size of the key that was used, then subtract 1 byte because the last value of the tryByteSize threw the exception
+  unusedSpace = tryByteSize + testQuotaKey.length - 1;
+  return unusedSpace;
+}
+
+function getLocalStorageQuotaInBytes() {
+    // Returns the total Bytes of Local Storage Space that the browser supports
+    storageStatus.value = true
+    var unused = getUnusedSpaceOfLocalStorageInBytes();
+    var used = getUsedSpaceOfLocalStorageInBytes();
+    var quota = unused + used;
+    story.currentStorage = used
+    story.maxStorage = quota
+    return quota;
+}
+/* End Check The LocalStorage... */
 
 let filteredStory = computed(() =>
   search.value === ''
@@ -152,18 +239,21 @@ let filteredStory = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col h-screen">
-    <div class="navbar bg-primary shadow-lg">
+  <div class="flex flex-col h-screen" :style='{height: story.innerHeight + "px"}'>
+    <div class="navbar bg-primary shadow-lg text-primary-content">
       <div class='flex-1'>
         <button class="btn btn-ghost normal-case text-xl">TweezeL</button>
+      </div>
+      <div class='shrink'>
+        <label for='limit-modal' class="btn btn-ghost normal-case text-xl">{{ Math.round(story.currentStorage / story.maxStorage * 100) }}%</label>
       </div>
       <div class="dropdown dropdown-end">
         <label tabindex="0" class="btn btn-ghost btn-square m-1">
           <svg fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
         </label>
         <ul tabindex="0" class="dropdown-content menu p-2 rounded-box shadow-xl bg-primary mt-4">
-          <li><label for="setting-modal">Setting</label></li>
-          <li><label for="about-modal">About</label></li>
+          <li class="p-1"><label for="setting-modal">Setting</label></li>
+          <li class="p-1"><label for="about-modal">About</label></li>
           <li v-if="installPromptMain"><label @click="installPromptMain.prompt()">Install</label></li>
         </ul>
       </div>
@@ -201,14 +291,14 @@ let filteredStory = computed(() =>
                     </label>
                     <ul tabindex="0" class="dropdown-content menu menu-compact p-2 bg-base-100 rounded-box shadow-xl">
                       <li>
-                        <button @click="deleteStory(element.ifid)" class='bg-error'>
+                        <button @click="deleteStory(element.ifid)" class='bg-error text-error-content'>
                           Delete
                         </button>
                       </li>
                     </ul>
                   </div>
                 </div>
-                <router-link :to="`/story/${index}`" class="py-4 static w-full px-12 truncate">
+                <router-link :to="`/story/${element.ifid}`" class="py-4 static w-full px-12 truncate">
                   {{element.title}}
                 </router-link>
               </div>
@@ -241,16 +331,37 @@ let filteredStory = computed(() =>
   <div class="modal modal-bottom sm:modal-middle">
     <div class="modal-box relative">
       <label for="setting-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
-      <p class='text-xl py-2'>Load Story From Backup.</p>
+
+      <div class='divider text-xl'>Setting</div>
+
+      <p class='text-base py-2'>Choose Theme.</p>
+      <div class='flex flex-col gap-1'>
+        <div v-for="(theme, index) in themeList" :key='index' class='form-control'>
+          <label class='label cursor-pointer bg-base-100 rounded-md p-2' :data-theme='theme'>
+            <div class='flex flex-row gap-1'>
+              <span class='aspect-square w-5 text-center bg-primary text-primary-content'>A</span>
+              <span class='aspect-square w-5 text-center bg-secondary text-secondary-content'>A</span>
+              <span class='aspect-square w-5 text-center bg-accent text-accent-content'>A</span>
+              <span class='aspect-square w-5 text-center bg-neutral text-neutral-content'>A</span>
+              <span class='label-text capitalize'>{{ theme }}</span>
+            </div>
+            <input type='radio' name='theme-radio' class='radio' :value='theme' @change='changeTheme($event)' :checked='story.theme === theme' />
+          </label>
+        </div>
+      </div>
+
+      <button @click='refreshStory()' class='btn btn-primary btn-block btn-sm mt-2'>Refresh Theme List ?.</button>
+
+      <div class='divider'></div>
+
+      <p class='text-base py-2'>Load Story From Backup.</p>
       <button @click='loadStory.click()' class='btn btn-primary btn-block btn-sm'>Choose Story Backup To Load.</button>
       <input @change='readData' class="h-0 w-0" type="file" id="jsonfileinput" ref='loadStory' accept='.tweezeldata' />
 
-      <div class='divider'>OR</div>
-
-      <p class='text-xl py-2'>Create Backup Of An Entire Story.</p>
+      <p class='text-base py-2'>Create Backup Of An Entire Story.</p>
       <button @click="download('TweezeL Backup', JSON.stringify(story.story))" class='btn btn-primary btn-block btn-sm'>Backup The Entire Story.</button>
 
-      <p class='text-xl py-2'>Load Entire Story From Backup.</p>
+      <p class='text-base py-2'>Load Entire Story From Backup.</p>
       <button @click='loadWholeStory.click()' class='btn btn-primary btn-block btn-sm'>Choose Whole Story Backup To Load.</button>
       <input @change='readWholeData' class="h-0 w-0" type="file" id="jsonwholestoryfileinput" ref='loadWholeStory' accept='.tweezeldata' />
     </div>
@@ -273,4 +384,34 @@ let filteredStory = computed(() =>
       <label for="about-modal" class="btn btn-success btn-block btn-sm mt-2">Happy Creating !.</label>
     </div>
   </div>
+
+  <ModalComponent
+    idProps='limit-modal'
+    :modalAction='[
+      {
+        className:"btn btn-primary",
+        closeOnClick:true,
+        label:"Check Storage.",
+        onPress:getLocalStorageQuotaInBytes
+      },
+      {
+        className:"btn btn-success",
+        closeOnClick:true,
+        label:"Close."
+      }
+    ]'
+  >
+    <template v-slot:children>
+      <StorageDetail />
+    </template>
+  </ModalComponent>
+
+  <input type="checkbox" id="check-modal" class="modal-toggle" />
+  <div :class="['modal modal-bottom sm:modal-middle ', storageStatus ? 'modal-open' : '']">
+    <div class="modal-box relative flex flex-col items-center">
+      <h3 class="font-bold text-lg mb-4 text-center">Please Give Me A Moment. Checking LocalStorage Space. It Takes Up To 20 Sec. This Message Will Close After It's Done.</h3>
+      <progress class="progress w-56"></progress>
+    </div>
+  </div>
+
 </template>

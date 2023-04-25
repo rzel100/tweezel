@@ -1,10 +1,12 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { storyData } from '@/stores/story'
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 const story = storyData()
 const route = useRoute()
-const theStory = route.params.id
+const theIfid = route.params.id
+const findIfid = (element) => element.ifid == theIfid;
+const theStory = story.story.findIndex(findIfid)
 
 const chapbook_1 = new URL('./chapbook-1-temp.txt', import.meta.url).href
 const harlowe_1 = new URL('./harlowe-1-temp.txt', import.meta.url).href
@@ -29,7 +31,7 @@ function createTheStory(data) {
     passageDataNyaTmp = '<tw-passagedata pid="'+story.story[theStory].passage[i].pid+'" name="'+story.story[theStory].passage[i].name+'" tags="" position="100,100" size="100,100">'+dataTmpHtmlSafe+'</tw-passagedata>'
     passageDataNya = passageDataNya + passageDataNyaTmp
   }
-  let realData = data.replace(/tweezelStoryTitle/g, story.story[theStory].title).replace(/tweezelStoryIfid/g, story.story[theStory].ifid).replace(/tweezelStoryStartNode/g, story.story[theStory].startNode).replace(/tweezelStoryUserStyle/g, story.story[theStory].userStyle).replace(/tweezelStoryUserScript/g, story.story[theStory].userScript).replace(/tweezelStoryPassage/g, passageDataNya).replace(/tweezelVersion/g, '1.1.0')
+  let realData = data.replace(/tweezelStoryTitle/g, story.story[theStory].title).replace(/tweezelStoryIfid/g, story.story[theStory].ifid).replace(/tweezelStoryStartNode/g, story.story[theStory].startNode).replace(/tweezelStoryUserStyle/g, story.story[theStory].userStyle).replace(/tweezelStoryUserScript/g, story.story[theStory].userScript).replace(/tweezelStoryPassage/g, passageDataNya).replace(/tweezelVersion/g, '1.2.0')
   gameCode.value = realData
 }
 if (story.story[theStory].passage.length == 0) {
@@ -93,10 +95,18 @@ function gameReady() {
   isLoading.value = false
   if (story.playState == 'play') {
     play.value = true
-  } else {
-    exportHTML()
   }
 }
+
+watch(() => gameCode.value, (gameCode) => {
+  if (gameCode.length === 0) {
+    return
+  }
+  if (story.playState === 'export') {
+    exportHTML()
+  }
+})
+
 function exportHTML() {
   let element = document.createElement('a');
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(gameCode.value));
@@ -109,13 +119,14 @@ function exportHTML() {
 </script>
 
 <template>
-  <div class="flex h-screen overflow-auto flex-col">
+  <div class="flex h-screen overflow-auto flex-col" :style='{height: story.innerHeight + "px"}'>
 
     <div v-if="errornya.length > 0" class="p-2">
       There Is Some Error In Your Story. Here Is The Error(s) :
       <div v-for="data, index in errornya" :key='index'>
         {{index + 1}}. {{data}}
       </div>
+      <span class="text-primary-content underline" @click='$router.back()'>Click Here To Go Back.</span>
     </div>
 
     <div v-else class="grow flex flex-col">
@@ -132,7 +143,7 @@ function exportHTML() {
       </div>
 
       <div v-show="!play" class="grow flex flex-col">
-        <div class="navbar bg-primary shadow-lg">
+        <div class="navbar bg-primary shadow-lg text-primary-content">
           <button tabindex="0" class="btn btn-ghost btn-square" @click='$router.back()'>
             <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 self-center m-2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75" />
@@ -142,9 +153,14 @@ function exportHTML() {
             <div class="normal-case text-xl truncate px-0 font-semibold">Play Story</div>
           </div>
         </div>
-        <div class='p-1' v-if="isLoading">Loading The Game... Please Wait A Bit...</div>
-        <div class='p-1' v-else>
-          Export Completed...
+        <div class='p-4' v-if="isLoading">Loading The Game... Please Wait A Bit...</div>
+        <div class='p-4' v-else>
+          <div class="alert alert-success shadow-lg">
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span>Export Completed...</span>
+            </div>
+          </div>
         </div>
       </div>
 
