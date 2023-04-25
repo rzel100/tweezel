@@ -406,12 +406,12 @@ let filteredStory = computed(() =>
     </template>
   </ModalComponent>
 
-  <input type="checkbox" id="check-modal" class="modal-toggle" />
+  <!-- <input type="checkbox" id="check-modal" class="modal-toggle" />
   <div :class="['modal modal-bottom sm:modal-middle ', storageStatus ? 'modal-open' : '']">
     <div class="modal-box relative flex flex-col items-center">
       <h3 class="font-bold text-lg mb-4 text-center">Please Give Me A Moment. Checking LocalStorage Space. It Takes Up To 20 Sec. This Message Will Close After It's Done.</h3>
       <progress class="progress w-56"></progress>
     </div>
-  </div>
+  </div> -->
 
 </template>
