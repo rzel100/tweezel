@@ -2,6 +2,13 @@
 import { useRoute } from 'vue-router'
 import { storyData } from '@/stores/story'
 import { ref } from 'vue';
+import { Codemirror } from 'vue-codemirror'
+import { oneDark } from '@codemirror/theme-one-dark'
+import {css} from '@codemirror/lang-css'
+import {javascript} from '@codemirror/lang-javascript'
+
+const extensionsCss = [oneDark, css()]
+const extensionsJavascript = [oneDark, javascript()]
 const story = storyData()
 const route = useRoute()
 const mode = ref('setting')
@@ -166,23 +173,27 @@ function download(filename, text) {
     </div>
 
     <div class="p-1 outline-none w-full grow flex flex-col" v-if="mode == 'css'">
-      <div class="form-control">
-        <label class="label cursor-pointer justify-start gap-2">
-          <input @click="story.isWrap = !story.isWrap" type="checkbox" class="toggle toggle-primary" :checked='!story.isWrap' />
-          <span class="label-text">Wrap</span> 
-        </label>
-      </div>
-      <textarea type="textarea" v-model="story.story[theStory].userStyle" :class="[story.isWrap ? 'whitespace-pre' : '', 'text-xs font-mono textarea textarea-bordered resize-none grow w-full p-1']"></textarea>
+      <codemirror
+        v-model="story.story[theStory].userStyle"
+        placeholder="Write The Code Here..."
+        :style="{ 'flex-grow' : '1' }"
+        :autofocus="true"
+        :indent-with-tab="true"
+        :tab-size="2"
+        :extensions="extensionsCss"
+      />
     </div>
     
     <div class="p-1 outline-none w-full grow flex flex-col" v-if="mode == 'js'">
-      <div class="form-control">
-        <label class="label cursor-pointer justify-start gap-2">
-          <input @click="story.isWrap = !story.isWrap" type="checkbox" class="toggle toggle-primary" :checked='!story.isWrap' />
-          <span class="label-text">Wrap</span> 
-        </label>
-      </div>
-      <textarea type="textarea" v-model="story.story[theStory].userScript" :class="[story.isWrap ? 'whitespace-pre' : '', 'text-xs font-mono textarea textarea-bordered resize-none grow w-full p-1']"></textarea>
+      <codemirror
+        v-model="story.story[theStory].userScript"
+        placeholder="Write The Code Here..."
+        :style="{ 'flex-grow' : '1' }"
+        :autofocus="true"
+        :indent-with-tab="true"
+        :tab-size="2"
+        :extensions="extensionsJavascript"
+      />
     </div>
   </div>
 </template>

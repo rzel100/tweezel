@@ -37,10 +37,10 @@ Give It A Try. :3.
 - [x] PWA !. Awesome... Now U Can Install TweezeL To Your Devices. For Offline Use !. Try Open TweezeL Using Chrome !.
 - [x] New Icon !. Thanks To My Friend...
 - [x] Many Daisy UI Theme Now... Try It Out...
+- [x] New Code Editor... Using Code Mirror... :)
 
 <hr>
 
 For Next Objective Of This Tools, I Want This Tools To :
 
 - Adding My Tutorial To TweezeL.
-- Moving TweezeL To Itch.io...??? I'll Do That...

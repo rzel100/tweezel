@@ -141,3 +141,15 @@ List Addition / Changes :
 - Fixing Export Sometimes Output 2 Files. 1 Of Them Has 0 Size.
 - Fixing Rezise Sometimes Not Responsive.
 - Fixing Css And Some Code.
+
+## 1.2.1
+
+Date : 21-May-2023
+
+> Small Changes But Big !.  
+> All New Code Editor. Using CodeMirror.
+
+List Addition / Changes :
+
+- New Code Editor !. Check Them Out !.
+- Fixing Css And Some Code.

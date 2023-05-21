@@ -3,6 +3,11 @@ import { useRoute } from 'vue-router'
 import { storyData } from '@/stores/story'
 import { ref } from 'vue';
 import { createToaster } from "@meforma/vue-toaster";
+import { Codemirror } from 'vue-codemirror'
+import { oneDark } from '@codemirror/theme-one-dark'
+
+const extensions = [oneDark]
+
 const story = storyData()
 const route = useRoute()
 const theIfid = route.params.id
@@ -57,7 +62,7 @@ function setName(name) {
       </div>
     </div>
 
-    <div class='w-full px-2 pb-2 flex flex-col h-full'>
+    <div class='w-full px-2 pb-2 flex flex-col h-full gap-2'>
       <div class="form-control">
         <label class="label">
           <span class="label-text">Passage Names</span>
@@ -69,16 +74,15 @@ function setName(name) {
           </span>
         </label>
       </div>
-      <div class="flex flex-row w-full items-center gap-2">
-        <div class="form-control w-fit">
-          <label class="label cursor-pointer justify-start gap-2">
-            <input @click="story.isWrap = !story.isWrap" type="checkbox" class="toggle toggle-primary" :checked='!story.isWrap' />
-            <span class="label-text">Wrap</span> 
-          </label>
-        </div>
-      </div>
-      <img id="output"/>
-      <textarea type="textarea" v-model="story.story[storyIndex].passage[passageIndex].data" :class="[story.isWrap ? 'whitespace-pre' : '', 'text-xs font-mono textarea textarea-bordered resize-none grow w-full h-full px-1']"></textarea>
+      <codemirror
+        v-model="story.story[storyIndex].passage[passageIndex].data"
+        placeholder="Write The Code Here..."
+        :style="{ 'flex-grow' : '1' }"
+        :autofocus="true"
+        :indent-with-tab="true"
+        :tab-size="2"
+        :extensions="extensions"
+      />
     </div>
 
   </div>
