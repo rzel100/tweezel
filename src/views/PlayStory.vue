@@ -2,6 +2,15 @@
 import { useRoute } from 'vue-router'
 import { storyData } from '@/stores/story'
 import { ref, watch } from 'vue';
+import {Directory} from "@capacitor/filesystem";
+// import {Capacitor} from "@capacitor/core";
+import write_blob from "capacitor-blob-writer";
+import { createToaster } from "@meforma/vue-toaster";
+const toaster = createToaster({
+  position : 'top',
+  duration : 2000,
+  dismissible : true
+});
 const story = storyData()
 const route = useRoute()
 const theIfid = route.params.id
@@ -22,16 +31,29 @@ const play = ref(false)
 const isLoading = ref(true)
 sessionStorage.clear()
 const errornya = ref([])
+// const theImagesId = ref([])
+// const theImages = ref([])
+
 function createTheStory(data) {
   let passageDataNya = ''
   let passageDataNyaTmp = ''
   for (let i = 0;i < story.story[theStory].passage.length;i++) {
     let dataTmp = story.story[theStory].passage[i].data
+    let findImagePath = dataTmp.match(/%img%[\s\S]*?%/gi)
+    if (findImagePath && findImagePath.length > 0) {
+      findImagePath.map((e) => {
+        let oldSrc = e.split("%img%").join("").slice(0, -1).trim()
+        const found = story.story[theStory].imageList.find(image => image.name.trim() == oldSrc);
+        if (found) {
+          dataTmp = dataTmp.replace(e, found.src)
+        }
+      })
+    }
     let dataTmpHtmlSafe = dataTmp.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     passageDataNyaTmp = '<tw-passagedata pid="'+story.story[theStory].passage[i].pid+'" name="'+story.story[theStory].passage[i].name+'" tags="" position="100,100" size="100,100">'+dataTmpHtmlSafe+'</tw-passagedata>'
     passageDataNya = passageDataNya + passageDataNyaTmp
   }
-  let realData = data.replace(/tweezelStoryTitle/g, story.story[theStory].title).replace(/tweezelStoryIfid/g, story.story[theStory].ifid).replace(/tweezelStoryStartNode/g, story.story[theStory].startNode).replace(/tweezelStoryUserStyle/g, story.story[theStory].userStyle).replace(/tweezelStoryUserScript/g, story.story[theStory].userScript).replace(/tweezelStoryPassage/g, passageDataNya).replace(/tweezelVersion/g, '1.2.1')
+  let realData = data.replace(/tweezelStoryTitle/g, story.story[theStory].title).replace(/tweezelStoryIfid/g, story.story[theStory].ifid).replace(/tweezelStoryStartNode/g, story.story[theStory].startNode).replace(/tweezelStoryUserStyle/g, story.story[theStory].userStyle).replace(/tweezelStoryUserScript/g, story.story[theStory].userScript).replace(/tweezelStoryPassage/g, passageDataNya).replace(/tweezelVersion/g, '1.2.2')
   gameCode.value = realData
 }
 if (story.story[theStory].passage.length == 0) {
@@ -95,8 +117,38 @@ function gameReady() {
   isLoading.value = false
   if (story.playState == 'play') {
     play.value = true
+    // if (theImages.value.length > 0) {
+    //   theImages.value.map((e, i) => {
+    //     const macan = theImagesId.value
+    //     toaster.success(`ada id Browaokowa... ${macan} ${i} ${macan[i]}`)
+    //     let theEl = document.getElementById('storyWindow').contentWindow.document.getElementById(`${macan[i]}`)
+    //     // theEl.src = Capacitor.convertFileSrc(e);
+    //     theEl.src = 'https://www.gravatar.com/avatar/hkjjasd0?d=monsterid&f=y'
+    //     if (theEl) {
+    //       toaster.success(`ada id... ${theEl.src}`)
+    //     }
+    //   })
+    // }
   }
 }
+
+// watch(() => theImages.value, (theImag) => {
+//   if (theImag.length === 0) {
+//     return
+//   }
+//   if (theImag.length > 0) {
+//     theImag.map((e, i) => {
+//       const macan = theImagesId.value
+//       toaster.success(`ada id Browaokowa... ${macan}`)
+//                // document.getElementById("storyWindow").contentWindow.document.getElementById("macan-bogeng")
+//       let theEl = document.getElementById('storyWindow').contentWindow.document.getElementById(`${theImagesId.value[i]}`)
+//       theEl.src = Capacitor.convertFileSrc(e);
+//       if (theEl) {
+//         toaster.success(`ada id... ${theEl.src}`)
+//       }
+//     })
+//   }
+// })
 
 watch(() => gameCode.value, (gameCode) => {
   if (gameCode.length === 0) {
@@ -104,17 +156,58 @@ watch(() => gameCode.value, (gameCode) => {
   }
   if (story.playState === 'export') {
     exportHTML()
-  }
+  } 
+  // else {
+  //   toaster.success(`Run...`)
+  //   let findImagePath = dataTmp.match(/%path%[\s\S]*?%/gi)
+  //   if (findImagePath && findImagePath.length > 0) {
+  //     findImagePath.map((e) => {
+  //       let nweRegex = e.split("%path%").join("").slice(0, -1)
+  //       let newRegex = nweRegex.split("|")
+  //       let newUri = ''
+  //       Filesystem.getUri({
+  //         path: "Export/"+cleaningString(story.story[theStory].title)+"/"+newRegex[1],
+  //         directory: Directory.External
+  //       }).then(function ({uri}) {
+  //         toaster.success(`Done... ${uri}`)
+  //         theImages.value.push(uri)
+  //         theImagesId.value.push(newRegex[0])
+  //       });
+  //       dataTmp = dataTmp.replace(e, newRegex[0])
+  //     })
+  //   }
+  // }
 })
 
+const cleaningString = (text) => {
+  const str = text
+  const replaced = str.replace(/[^a-z0-9]/gi, '_');
+  return replaced
+}
+
+const writeFile = async (blob, filename, original_filename) => {
+  write_blob({
+    path: "Export/"+original_filename+"/"+filename,
+    directory: Directory.External,
+    blob: blob,
+    recursive: true,
+    on_fallback() {
+      toaster.error(`Failed...`)
+    }
+  }).then(function () {
+    toaster.success(`Done...`)
+  });
+};
+
+function download(filename, text) {
+  const new_filename = cleaningString(filename)
+  const blob = new Blob([text], { type : 'plain/text' });
+  const fileName = new_filename+'.html'
+  writeFile(blob, fileName, new_filename)
+}
+
 function exportHTML() {
-  let element = document.createElement('a');
-  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(gameCode.value));
-  element.setAttribute('download', story.story[theStory].title+'.html');
-  element.style.display = 'none';
-  document.body.appendChild(element);
-  element.click();
-  document.body.removeChild(element);
+  download(story.story[theStory].title, gameCode.value)
 }
 </script>
 
@@ -161,6 +254,8 @@ function exportHTML() {
               <span>Export Completed...</span>
             </div>
           </div>
+          <p class='text-sm py-2'>It Will Be Saved At "[Internal_Storage] -> Android -> data -> app.rzel.tweezel -> files -> Export -> [Story Name] -> [Here]". It's Extension Is ".html"</p>
+          <p class='text-sm py-2'>Nice. You Already Exported Your Game !. Go On, Upload Your Game To A Website Like Itch.io Or Your Own Website !. Or Simply Share It To Your Friends And Have Them Play Your Game !.</p>
         </div>
       </div>
 

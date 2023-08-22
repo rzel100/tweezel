@@ -142,14 +142,34 @@ List Addition / Changes :
 - Fixing Rezise Sometimes Not Responsive.
 - Fixing Css And Some Code.
 
+## Android Ver.
+
+Below This. Is Only An Update For Android Version Of The App.
+
 ## 1.2.1
 
-Date : 21-May-2023
+Date : 1-June-2023
 
-> Small Changes But Big !.  
-> All New Code Editor. Using CodeMirror.
+> Big Update  
+> Now The App Is On PlayStore !.  
+> Use The PlayStore Version. It Is Much Better !.  
+> Maybe I'll Not Update The Web Version Anymore. Sorry :(  
+> But. If Someday Many People Use My App And Want The Web Version Updated. I'll Update It !.
 
 List Addition / Changes :
 
+- New Android Release !. With Much Recent Feature Available !.
+- Ability To Add Image To Your Game.
 - New Code Editor !. Check Them Out !.
 - Fixing Css And Some Code.
+
+## 1.2.2
+
+Date : 22-August-2023
+
+> Small Update.
+
+List Addition / Changes :
+
+- Fix Import Backup.
+- The App Will Detect Any Broken Path Now.

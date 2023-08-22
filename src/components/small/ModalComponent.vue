@@ -28,7 +28,6 @@ defineProps([
       <label :for="idProps" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
       <slot name="children"></slot>
       <div class="modal-action">
-        <!-- <label for="limit-modal" @click='getLocalStorageQuotaInBytes()' class="btn btn-primary">Check Storage.</label> -->
         <template v-if='modalAction.length > 0'>
           <label v-for="(item, index) in modalAction" :key='index' :class='item.className' @click='item.onPress' :for='item.closeOnClick ? idProps : "none"'>{{ item.label }}</label>
         </template>

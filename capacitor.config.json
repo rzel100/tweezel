@@ -1,0 +1,8 @@
+{
+  "appId": "app.rzel.tweezel",
+  "appName": "tweezel",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

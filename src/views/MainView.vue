@@ -4,15 +4,15 @@ import { RouterLink } from 'vue-router'
 import draggable from 'vuedraggable'
 import { createToaster } from "@meforma/vue-toaster";
 import { storyData } from '@/stores/story'
-import { StorageDetail } from '@/components/medium/index.vue';
-import { ModalComponent } from '@/components/small/index.vue';
+import {Directory} from "@capacitor/filesystem";
+import write_blob from "capacitor-blob-writer";
 const story = storyData()
 const storyName = ref('')
 const isNew = ref(false)
 const mode = ref('story')
 const storyList = ref(story.story)
 const themeList = ref(story.themeList)
-const storageStatus = ref(false)
+// const storageStatus = ref(false)
 const loadStory = ref(null)
 const loadWholeStory = ref(null)
 const installPromptMain = ref(null)
@@ -72,6 +72,7 @@ function createStory() {
       userStyle : '/* Design Your Styling In Here */',
       userScript : '// Type Your Own Javascript In Here',
       storyformats : 'sugarcube-2',
+      imageList : [],
       passage : [
         {
           name : 'start',
@@ -121,7 +122,13 @@ function readData() {
       let content = e.target.result
       let storyData = JSON.parse(content)
       if (checkLegit(storyData)) {
+        const found = story.story.find(story => story.ifid == storyData.ifid);
+        if (found) {
+          deleteStory(storyData.ifid)
+        }
         story.story.push(storyData)
+      } else {
+        toaster.error(`Wrong File To Read...`)
       }
       mode.value = 'story'
     }
@@ -139,7 +146,13 @@ function readWholeData() {
       if (storyData.length > 0) {
         for (let i = 0;i < storyData.length;i++) {
           if (checkLegit(storyData[i])) {
+            const found = story.story.find(story => story.ifid == storyData[i].ifid);
+            if (found) {
+              deleteStory(storyData[i].ifid)
+            }
             story.story.push(storyData[i])
+          } else {
+            toaster.error(`Wrong File To Read...`)
           }
         }
       }
@@ -153,78 +166,34 @@ function changeTheme(data) {
   story.theme = data.target.value
 }
 
+const cleaningString = (text) => {
+  const str = text
+  const replaced = str.replace(/[^a-z0-9]/gi, '_');
+  return replaced
+}
+
+const writeFile = async (blob, filename) => {
+  write_blob({
+    path: "Global_Backup/"+filename,
+    directory: Directory.External,
+    blob: blob,
+    recursive: true,
+    on_fallback() {
+      toaster.error(`Failed...`)
+    }
+  }).then(function () {
+    toaster.success(`Done...`)
+  });
+};
+
 function download(filename, text) {
+  const new_filename = cleaningString(filename)
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const d = new Date();
-  var element = document.createElement('a');
-  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-  element.setAttribute('download', filename+' '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+'.tweezeldata');
-  element.style.display = 'none';
-  document.body.appendChild(element);
-  element.click();
-  document.body.removeChild(element);
+  const blob = new Blob([text], { type : 'plain/text' });
+  const fileName = new_filename+' '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+'.tweezeldata'
+  writeFile(blob, fileName)
 }
-
-/* Check The LocalStorage... */
-function getUsedSpaceOfLocalStorageInBytes() {
-    // Returns the total number of used space (in Bytes) of the Local Storage
-    var b = 0;
-    for (var key in window.localStorage) {
-        // eslint-disable-next-line no-prototype-builtins
-        if (window.localStorage.hasOwnProperty(key)) {
-            b += key.length + localStorage.getItem(key).length;
-        }
-    }
-    return b;
-}
-
-function getUnusedSpaceOfLocalStorageInBytes() {
-  var maxByteSize = 10485760; // 10MB
-  var minByteSize = 0;
-  var tryByteSize = 0;
-  var testQuotaKey = 'testQuota';
-  var timeout = 20000;
-  var startTime = new Date().getTime();
-  var unusedSpace = 0;
-  let runtime = 0
-  do {
-    runtime = new Date().getTime() - startTime;
-    try {
-      tryByteSize = Math.floor((maxByteSize + minByteSize) / 2);
-      //localStorage.setItem(testQuotaKey, new Array(tryByteSize).join('1'));
-      
-      //Recommended by @pkExec and @jrob007
-      localStorage.setItem(testQuotaKey, String('1').repeat(tryByteSize));
-      minByteSize = tryByteSize;
-    } catch (e) {
-      maxByteSize = tryByteSize - 1;
-    }
-  } while ((maxByteSize - minByteSize > 1) && runtime < timeout);
-
-  localStorage.removeItem(testQuotaKey);
-
-  storageStatus.value = false
-
-  if (runtime >= timeout) {
-    console.log("Unused Space Calculation May Be Off Due To Timeout.");
-  }
-
-  // Compensate for the byte size of the key that was used, then subtract 1 byte because the last value of the tryByteSize threw the exception
-  unusedSpace = tryByteSize + testQuotaKey.length - 1;
-  return unusedSpace;
-}
-
-function getLocalStorageQuotaInBytes() {
-    // Returns the total Bytes of Local Storage Space that the browser supports
-    storageStatus.value = true
-    var unused = getUnusedSpaceOfLocalStorageInBytes();
-    var used = getUsedSpaceOfLocalStorageInBytes();
-    var quota = unused + used;
-    story.currentStorage = used
-    story.maxStorage = quota
-    return quota;
-}
-/* End Check The LocalStorage... */
 
 let filteredStory = computed(() =>
   search.value === ''
@@ -243,9 +212,6 @@ let filteredStory = computed(() =>
     <div class="navbar bg-primary shadow-lg text-primary-content">
       <div class='flex-1'>
         <button class="btn btn-ghost normal-case text-xl">TweezeL</button>
-      </div>
-      <div class='shrink'>
-        <label for='limit-modal' class="btn btn-ghost normal-case text-xl">{{ Math.round(story.currentStorage / story.maxStorage * 100) }}%</label>
       </div>
       <div class="dropdown dropdown-end">
         <label tabindex="0" class="btn btn-ghost btn-square m-1">
@@ -277,7 +243,7 @@ let filteredStory = computed(() =>
             handle=".handle"
             item-key="title"
           >
-            <template #item="{element, index}">
+            <template #item="{element}">
               <div class='relative flex items-center transition-all hover:bg-black/20'>
                 <div v-if="search.length == 0" class="handle absolute left-3 cursor-move">
                   <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -355,13 +321,21 @@ let filteredStory = computed(() =>
       <div class='divider'></div>
 
       <p class='text-base py-2'>Load Story From Backup.</p>
+      <p class='text-sm py-2'>IF THE STORY IS ALREADY EXIST. THIS WILL REPLACE IT !.</p>
       <button @click='loadStory.click()' class='btn btn-primary btn-block btn-sm'>Choose Story Backup To Load.</button>
       <input @change='readData' class="h-0 w-0" type="file" id="jsonfileinput" ref='loadStory' accept='.tweezeldata' />
 
+      <div class='divider'></div>
+
       <p class='text-base py-2'>Create Backup Of An Entire Story.</p>
+      <p class='text-sm py-2'>It Will Be Saved At "[Internal_Storage] -> Android -> data -> app.rzel.tweezel -> files -> Global_Backup -> [Here]". It's Extension Is ".tweezeldata"</p>
+      <p class='text-sm py-2'>Later. U Can Use "Choose Whole Story Backup To Load." Button To Select The File And Restore Your Backup. Or Just To Share It To Your Friends And Let Them Load Your Story Into Their Devices :).</p>
       <button @click="download('TweezeL Backup', JSON.stringify(story.story))" class='btn btn-primary btn-block btn-sm'>Backup The Entire Story.</button>
 
+      <div class='divider'></div>
+
       <p class='text-base py-2'>Load Entire Story From Backup.</p>
+      <p class='text-sm py-2'>IF THE STORY IS ALREADY EXIST. THIS WILL REPLACE IT !.</p>
       <button @click='loadWholeStory.click()' class='btn btn-primary btn-block btn-sm'>Choose Whole Story Backup To Load.</button>
       <input @change='readWholeData' class="h-0 w-0" type="file" id="jsonwholestoryfileinput" ref='loadWholeStory' accept='.tweezeldata' />
     </div>
@@ -384,26 +358,5 @@ let filteredStory = computed(() =>
       <label for="about-modal" class="btn btn-success btn-block btn-sm mt-2">Happy Creating !.</label>
     </div>
   </div>
-
-  <ModalComponent
-    idProps='limit-modal'
-    :modalAction='[
-      {
-        className:"btn btn-primary",
-        closeOnClick:true,
-        label:"Check Storage.",
-        onPress:getLocalStorageQuotaInBytes
-      },
-      {
-        className:"btn btn-success",
-        closeOnClick:true,
-        label:"Close."
-      }
-    ]'
-  >
-    <template v-slot:children>
-      <StorageDetail />
-    </template>
-  </ModalComponent>
 
 </template>

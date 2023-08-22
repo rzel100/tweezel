@@ -49,7 +49,7 @@ function setName(name) {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col" :style='{height: story.innerHeight + "px"}'>
+  <div class="h-screen flex flex-col overflow-auto" :style='{height: story.innerHeight + "px"}'>
 
     <div class="navbar bg-primary shadow-lg text-primary-content">
       <button tabindex="0" class="btn btn-ghost btn-square" @click='$router.back()'>
@@ -62,7 +62,7 @@ function setName(name) {
       </div>
     </div>
 
-    <div class='w-full px-2 pb-2 flex flex-col h-full gap-2'>
+    <div class='w-full px-2 pb-2 flex flex-col gap-2 grow h-0'>
       <div class="form-control">
         <label class="label">
           <span class="label-text">Passage Names</span>
@@ -74,15 +74,17 @@ function setName(name) {
           </span>
         </label>
       </div>
-      <codemirror
-        v-model="story.story[storyIndex].passage[passageIndex].data"
-        placeholder="Write The Code Here..."
-        :style="{ 'flex-grow' : '1' }"
-        :autofocus="true"
-        :indent-with-tab="true"
-        :tab-size="2"
-        :extensions="extensions"
-      />
+      <div class="overflow-auto grow">
+        <codemirror
+          v-model="story.story[storyIndex].passage[passageIndex].data"
+          placeholder="Write The Code Here..."
+          :style="{ 'flex-grow' : '1' }"
+          :autofocus="true"
+          :indent-with-tab="true"
+          :tab-size="2"
+          :extensions="extensions"
+        />
+      </div>
     </div>
 
   </div>

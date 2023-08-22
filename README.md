@@ -4,8 +4,10 @@ TweezeL Is A Free Tools For Creating Twine Games On Android.
 This Tools Build With **VueJS 3 + Tailwind Css + Daisy UI** For Styling.
 
 Link Tools :
+
 - https://tweezel.netlify.app
 - https://rzel.itch.io/tweezel
+- NEW...!!! Android...!!! https://play.google.com/store/apps/details?id=app.rzel.tweezel
 
 Now Support All Official Listed Story Formats On Twine 2.  
 Such As Chapbook, Harlowe, Snowman, And Sugarcube.
@@ -13,8 +15,8 @@ Such As Chapbook, Harlowe, Snowman, And Sugarcube.
 I Think This Tools Already Good To Go. :3  
 Give It A Try. :3.
 
-Also It's PWA !. U Can Install It And Use It Offline !.  
-Give It A Try. :3.
+~Also It's PWA !. U Can Install It And Use It Offline !.  
+~Give It A Try. :3.~
 
 ## TweezeL Feature
 
@@ -38,6 +40,9 @@ Give It A Try. :3.
 - [x] New Icon !. Thanks To My Friend...
 - [x] Many Daisy UI Theme Now... Try It Out...
 - [x] New Code Editor... Using Code Mirror... :)
+- [x] Now It Released On Play Store... Try It Out...
+- [x] You Can Import Image Now... And Use It On Your Story...
+- [x] Error Detection... It Will Notice You Where The Passage Path Error On The Story...
 
 <hr>
 

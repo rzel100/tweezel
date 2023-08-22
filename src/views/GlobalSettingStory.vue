@@ -6,6 +6,14 @@ import { Codemirror } from 'vue-codemirror'
 import { oneDark } from '@codemirror/theme-one-dark'
 import {css} from '@codemirror/lang-css'
 import {javascript} from '@codemirror/lang-javascript'
+import {Directory} from "@capacitor/filesystem";
+import write_blob from "capacitor-blob-writer";
+import { createToaster } from "@meforma/vue-toaster";
+const toaster = createToaster({
+  position : 'top',
+  duration : 2000,
+  dismissible : true
+});
 
 const extensionsCss = [oneDark, css()]
 const extensionsJavascript = [oneDark, javascript()]
@@ -15,9 +23,9 @@ const mode = ref('setting')
 const theIfid = route.params.id
 const findIfid = (element) => element.ifid == theIfid;
 const theStory = story.story.findIndex(findIfid)
-const storyNames = ref(story.story[theStory].title)
-const trueStoryNames = storyNames.value
-const dataName = ref(story.story)
+// const storyNames = ref(story.story[theStory].title)
+// const trueStoryNames = storyNames.value
+// const dataName = ref(story.story)
 const listStoryFormats = ref([
   {
     name : 'Chapbook 1.2.1',
@@ -53,30 +61,49 @@ const listStoryFormats = ref([
   },
 ])
 
-let nameList = dataName.value.map(function(data){
-  return data.title
-})
+// let nameList = dataName.value.map(function(data){
+//   return data.title
+// })
 
-function setName(name) {
-  let hasilnya = 0
-  nameList.forEach(function(data){
-    if (data == name) {
-      hasilnya += 1
-    }
-  })
-  if (hasilnya == 0) {
-    story.story[theStory].title = name
-  }
+// function setName(name) {
+//   let hasilnya = 0
+//   nameList.forEach(function(data){
+//     if (data == name) {
+//       hasilnya += 1
+//     }
+//   })
+//   if (hasilnya == 0) {
+//     story.story[theStory].title = name
+//   }
+// }
+
+const cleaningString = (text) => {
+  const str = text
+  const replaced = str.replace(/[^a-z0-9]/gi, '_');
+  return replaced
 }
 
+const writeFile = async (blob, filename, original_filename) => {
+  write_blob({
+    path: "Backup/"+original_filename+"/"+filename,
+    directory: Directory.External,
+    blob: blob,
+    recursive: true,
+    on_fallback() {
+      toaster.error(`Failed...`)
+    }
+  }).then(function () {
+    toaster.success(`Done...`)
+  });
+};
+
 function download(filename, text) {
-    var element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-    element.setAttribute('download', filename);
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+  const new_filename = cleaningString(filename)
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const d = new Date();
+  const blob = new Blob([text], { type : 'plain/text' });
+  const fileName = new_filename+' '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+'.tweezeldata'
+  writeFile(blob, fileName, new_filename)
 }
 </script>
 
@@ -105,7 +132,7 @@ function download(filename, text) {
         <label class="label">
           <span class="label-text">Story Title</span>
         </label>
-        <input @change="setName(trueStoryNames)" v-model="trueStoryNames" type="text" placeholder="Story Title Must Not Empty" class="input input-bordered w-full" />
+        <input v-model="story.story[theStory].title" type="text" placeholder="Story Title Must Not Empty" class="input input-bordered w-full" />
       </div>
       <div class="form-control w-full">
         <label class="label">
@@ -169,10 +196,13 @@ function download(filename, text) {
         </label>
         <input v-model="story.story[theStory].ifid" disabled type="text" class="input input-disabled input-bordered w-full" />
       </div>
-      <button @click="download(story.story[theStory].title+'.tweezeldata', JSON.stringify(story.story[theStory]))" class="btn btn-primary btn-block my-3">Backup This Story.</button>
+      <div class='divider'></div>
+      <button @click="download(story.story[theStory].title, JSON.stringify(story.story[theStory]))" class="btn btn-primary btn-block my-3">Backup This Story.</button>
+      <p class='text-sm py-2'>It Will Be Saved At "[Internal_Storage] -> Android -> data -> app.rzel.tweezel -> files -> Backup -> [Story Name] -> [Here]". It's Extension Is ".tweezeldata"</p>
+      <p class='text-sm py-2'>Later. U Can Use "Choose Story Backup To Load." Button At The Main Screen Setting To Select The File And Restore Your Backup. Or Just To Share It To Your Friends And Let Them Load Your Story Into Their Devices :).</p>
     </div>
 
-    <div class="p-1 outline-none w-full grow flex flex-col" v-if="mode == 'css'">
+    <div class="w-full p-1 flex flex-col gap-2 grow h-0 overflow-auto" v-if="mode == 'css'">
       <codemirror
         v-model="story.story[theStory].userStyle"
         placeholder="Write The Code Here..."
@@ -184,7 +214,7 @@ function download(filename, text) {
       />
     </div>
     
-    <div class="p-1 outline-none w-full grow flex flex-col" v-if="mode == 'js'">
+    <div class="w-full p-1 flex flex-col gap-2 grow h-0 overflow-auto" v-if="mode == 'js'">
       <codemirror
         v-model="story.story[theStory].userScript"
         placeholder="Write The Code Here..."

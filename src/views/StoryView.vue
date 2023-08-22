@@ -4,15 +4,19 @@ import { storyData } from '@/stores/story'
 import { ref, computed } from 'vue';
 import draggable from 'vuedraggable'
 import { createToaster } from "@meforma/vue-toaster";
+import Compressor from 'compressorjs';
 
 const story = storyData()
 const route = useRoute()
 const isNew = ref(false)
+const addImageButton = ref(null)
 const passageName = ref('')
-const groupName = ref('')
+const isDeleteImage = ref(false)
+const brokenPathList = ref([])
 const theIfid = route.params.id
 const findIfid = (element) => element.ifid == theIfid;
 const theStory = story.story.findIndex(findIfid)
+const imageList = ref(story.story[theStory].imageList)
 const passageList = ref(story.story[theStory].passage)
 const toaster = createToaster({
   position : 'top',
@@ -20,7 +24,6 @@ const toaster = createToaster({
   dismissible : true
 });
 let search = ref('')
-let grouping = ref('')
 story.storyId = theStory
 
 function sameName(data) {
@@ -80,6 +83,97 @@ let filteredPassage = computed(() =>
         .includes(search.value.toLowerCase().replace(/\s+/g, ''))
       )
 )
+
+const detectLostPath = () => {
+  story.story[theStory].passage.forEach((e) => {
+    const macan = e.data.match(/\[\[(.*?)\]\]/g)
+    let thePath = []
+    macan.forEach((found) => {
+      let ketemu = false
+      let theFound = found.replaceAll('[[', '').replaceAll(']]', '').split("|")
+      let theFoundPath = theFound[theFound.length - 1].trim()
+      story.story[theStory].passage.forEach((passage) => {
+        if (!ketemu) {
+          if (passage.name == theFoundPath) {
+            ketemu = true
+          }
+        }
+      })
+      if (!ketemu) {
+        if (!thePath.includes(theFoundPath)) {
+          thePath.push(theFoundPath)
+        }
+      }
+    })
+    e.error = thePath
+    if (e.error.length > 0) {
+      brokenPathList.value.push(e.name)
+    }
+  })
+}
+
+function addImageData(e) {
+
+  const file = e.target.files[0];
+
+  if (!file) {
+    return;
+  }
+
+  new Compressor(file, {
+    quality: 0.6,
+    success(result) {
+      const resultnya = result
+
+      let fileReader = new FileReader();
+
+      fileReader.onload = function(fileLoadedEvent) {
+        let srcData = fileLoadedEvent.target.result; // <--- data: base64
+        if (story.story[theStory].imageList) {
+          let nowPid = 1
+          let arrPid = []
+          for (let i = 0;i < story.story[theStory].imageList.length;i++) {
+            arrPid.push(story.story[theStory].imageList[i].id)
+          }
+          arrPid.sort(function(a, b) {
+            return a - b;
+          });
+          for (let i = 0;i < arrPid.length;i++) {
+            if (arrPid[i] == nowPid) {
+              nowPid++
+            }
+          }
+          story.story[theStory].imageList.push({
+            name : 'image-name-' + nowPid.toString(),
+            src : srcData,
+            id : nowPid.toString(),
+          })
+        } else {
+          story.story[theStory].imageList = []
+          story.story[theStory].imageList.push({
+            name : 'image-name-' + '1',
+            src : srcData,
+            id : '1'
+          })
+        }
+        addImageButton.value.value = null
+      }
+      fileReader.readAsDataURL(resultnya);
+    },
+    error(err) {
+      console.log(err.message);
+    },
+  });
+}
+
+function deleteImage(index) {
+  story.story[theStory].imageList = story.story[theStory].imageList.filter((image) =>
+    image.id !== index
+  )
+  imageList.value = story.story[theStory].imageList
+}
+
+detectLostPath()
 </script>
 
 <template>
@@ -112,6 +206,24 @@ let filteredPassage = computed(() =>
         </span>
       </label>
     </div>
+
+    <div v-if='brokenPathList.length > 0' class='p-2'>
+      <div class="alert alert-error items-start flex flex-col gap-1">
+        <div class='flex flex-row'>
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span>Error! Below Are The Passage That Have An Invalid Passage Link !.</span>
+        </div>
+        <!-- story.story[theStory].passage -->
+        <!-- <div v-for="data, index in brokenPathList" :key='index'>
+          {{index + 1}}. In "{{data}}" Path Found {{ story.story[theStory].passage[data].error }}
+        </div> -->
+        <div v-for="data, index in story.story[theStory].passage" :key='index'>
+          <template v-if='data.error.length > 0'>
+            In "{{data.name}}" Path Found "{{ data.error.join(', ') }}"
+          </template>
+        </div>
+      </div>
+    </div>
     
     <div class="w-full grow p-2 overflow-auto flex flex-col">
       <div class="grow overflow-auto pb-[69px]">
@@ -121,8 +233,8 @@ let filteredPassage = computed(() =>
             handle=".handle"
             item-key="pid"
           >
-            <template #item="{element, index}">
-              <div class='relative flex items-center transition-all hover:bg-black/20'>
+            <template #item="{element}">
+              <div :class='[element.error.length > 0 ? "bg-error text-error-content hover:bg-error/80" : "hover:bg-black/20", "relative flex items-center transition-all"]'>
                 <div v-if="search.length == 0" class="handle absolute left-3 cursor-move">
                   <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
@@ -142,7 +254,7 @@ let filteredPassage = computed(() =>
                     </ul>
                   </div>
                 </div>
-                <router-link :to="`/story/${story.story[theStory].ifid}/edit/${element.pid}`" class="py-4 static w-full px-12 truncate">
+                <router-link :to="`/story/${story.story[theStory].ifid}/edit/${element.pid}`" :class="['py-4 static w-full px-12 truncate']">
                   {{element.name}}
                 </router-link>
               </div>
@@ -169,6 +281,12 @@ let filteredPassage = computed(() =>
         </svg>
       </button>
     </router-link>
+
+    <label for='image-modal' class="btn btn-primary btn-circle cursor-pointer">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+      </svg>
+    </label>
   
     <label for='create-modal' class="btn btn-primary btn-circle cursor-pointer">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -185,6 +303,49 @@ let filteredPassage = computed(() =>
       <input v-model="passageName" type="text" placeholder="Passage Name" class="input input-bordered w-full" />
       <div class="modal-action">
         <label @click="addPassage()" for="create-modal" class="btn btn-success">Add Passage.</label>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="image-modal" class="modal-toggle" />
+  <div class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box p-0 relative">
+      <label for="image-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
+      <div class="p-2">
+        <h3 class="font-bold text-lg mb-4">Image List...</h3>
+        <div class='flex flex-col gap-2'>
+          <template v-if="imageList && imageList.length > 0">
+            <div v-for="(image, index) in imageList" :key='index' class='bg-primary py-1 px-3 rounded-md text-primary-content flex flex-row gap-2 items-center'>
+              <div class="w-14 h-14">
+                <img :src="image.src" class="w-full h-full object-contain"/>
+              </div>
+              <input v-model="story.story[theStory].imageList[index].name" type="text" placeholder="Image Name" class="input input-bordered input-xs grow bg-secondary input-secondary text-secondary-content" />
+              <!-- <div class="grow">
+                {{ image.name }}
+              </div> -->
+              <button v-if="isDeleteImage" @click="deleteImage(image.id)" class='bg-error text-error-content p-2'>
+                Delete
+              </button>
+            </div>
+          </template>
+          <template v-else>
+            <div class="bg-primary p-1 rounded-md text-primary-content flex flex-row gap-2 items-center">
+              No Image ?. No Problem. Try Add 1.
+            </div>
+          </template>
+        </div>
+        <template v-if="imageList && imageList.length > 0">
+          <p class="text-sm pt-2">
+            Put Image Name Inside src And Wrap It Using "%img% your_image_name %".<br />Example : {{`<img src="%img% `}}<u>{{`${story.story[theStory].imageList[0].name}`}}</u> {{`%" />`}}.
+          </p>
+        </template>
+      </div>
+      <!-- <input v-model="passageName" type="text" placeholder="Passage Name" class="input input-bordered w-full" /> -->
+      <div class="modal-action sticky bg-base-100 bottom-0 p-2">
+        <!-- <button @click='loadWholeStory.click()' class='btn btn-primary btn-block btn-sm'>Choose Whole Story Backup To Load.</button> -->
+        <label @click="isDeleteImage = !isDeleteImage" class="btn btn-error btn-sm">{{ isDeleteImage ? "Cancel Delete Image" : "Delete Image" }}.</label>
+        <input @change='addImageData' class="h-0 w-0" type="file" id="imageFileInput" ref='addImageButton' accept='image/*' />
+        <label @click="addImageButton.click()" class="btn btn-success btn-sm">Add Image.</label>
       </div>
     </div>
   </div>

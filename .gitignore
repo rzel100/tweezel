@@ -21,3 +21,8 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+resources/android/**/*
+resources/*
+public/.well-known/*
+android/*
