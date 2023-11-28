@@ -77,39 +77,69 @@ let filteredPassage = computed(() =>
   search.value === ''
     ? passageList.value
     : passageList.value.filter((onePassage) =>
-      onePassage.name
+      {return (onePassage.name
         .toLowerCase()
         .replace(/\s+/g, '')
-        .includes(search.value.toLowerCase().replace(/\s+/g, ''))
+        .includes(search.value.toLowerCase().replace(/\s+/g, '')) ||
+        onePassage.tags && onePassage.tags
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .includes(search.value.toLowerCase().replace(/\s+/g, '')) )}
       )
 )
 
+const readSquare = (data) => {
+  let newData = ''
+  if (data.includes('][')) {
+    newData = data.split('][')[0].trim()
+  } else {
+    newData = data
+  }
+  return newData
+}
+
 const detectLostPath = () => {
-  story.story[theStory].passage.forEach((e) => {
-    const macan = e.data.match(/\[\[(.*?)\]\]/g)
-    let thePath = []
-    macan.forEach((found) => {
-      let ketemu = false
-      let theFound = found.replaceAll('[[', '').replaceAll(']]', '').split("|")
-      let theFoundPath = theFound[theFound.length - 1].trim()
-      story.story[theStory].passage.forEach((passage) => {
-        if (!ketemu) {
-          if (passage.name == theFoundPath) {
-            ketemu = true
+  if (story.detectErrPassage) {
+    story.story[theStory].passage.forEach((e) => {
+      const macan = e.data.match(/\[\[(.*?)\]\]/g)
+      let thePath = []
+      if (macan && macan.length > 0) {
+        macan.forEach((found) => {
+          let ketemu = false
+          let theFound = found.replaceAll('[[', '').replaceAll(']]', '').split("|")
+          let theFoundPath = ''
+          if (theFound.length < 2) {
+            console.log(theFound)
+            if (theFound[0].includes('<-')) {
+              theFoundPath = readSquare(theFound[0].split('<-')[0].trim())
+            } else if (theFound[0].includes('->')) {
+              theFoundPath = readSquare(theFound[0].split('->')[theFound[0].split('->').length = 1].trim())
+            } else {
+              theFoundPath = theFound[theFound.length - 1].trim()
+            }
+          } else {
+            theFoundPath = theFound[theFound.length - 1].trim()
           }
-        }
-      })
-      if (!ketemu) {
-        if (!thePath.includes(theFoundPath)) {
-          thePath.push(theFoundPath)
-        }
+          story.story[theStory].passage.forEach((passage) => {
+            if (!ketemu) {
+              if (passage.name == theFoundPath) {
+                ketemu = true
+              }
+            }
+          })
+          if (!ketemu) {
+            if (!thePath.includes(theFoundPath)) {
+              thePath.push(theFoundPath)
+            }
+          }
+        })
+      }
+      e.error = thePath
+      if (e.error && e.error.length > 0) {
+        brokenPathList.value.push(e.name)
       }
     })
-    e.error = thePath
-    if (e.error.length > 0) {
-      brokenPathList.value.push(e.name)
-    }
-  })
+  }
 }
 
 function addImageData(e) {
@@ -173,6 +203,14 @@ function deleteImage(index) {
   imageList.value = story.story[theStory].imageList
 }
 
+// Opening Modal...
+const openCreateModal = () => {
+  document.getElementById("create-modal").showModal()
+}
+const openImageModal = () => {
+  document.getElementById("image-modal").showModal()
+}
+
 detectLostPath()
 </script>
 
@@ -198,9 +236,9 @@ detectLostPath()
     </div>
 
     <div class="form-control p-2">
-      <label class="input-group input-group-xs w-full">
-        <input v-model="search" type="text" placeholder="Search" class="input input-bordered input-xs grow" />
-        <span @click="search = ''" class='cursor-pointer'>
+      <label class="join w-full">
+        <input v-model="search" type="text" placeholder="Search" class="input input-bordered input-xs grow join-item" />
+        <span @click="search = ''" class='cursor-pointer join-item btn btn-xs'>
           <svg v-if="search.length > 0" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           <svg v-else class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
         </span>
@@ -209,7 +247,7 @@ detectLostPath()
 
     <div v-if='brokenPathList.length > 0' class='p-2'>
       <div class="alert alert-error items-start flex flex-col gap-1">
-        <div class='flex flex-row'>
+        <div class='flex flex-row gap-2'>
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           <span>Error! Below Are The Passage That Have An Invalid Passage Link !.</span>
         </div>
@@ -218,7 +256,7 @@ detectLostPath()
           {{index + 1}}. In "{{data}}" Path Found {{ story.story[theStory].passage[data].error }}
         </div> -->
         <div v-for="data, index in story.story[theStory].passage" :key='index'>
-          <template v-if='data.error.length > 0'>
+          <template v-if='data.error && data.error.length > 0'>
             In "{{data.name}}" Path Found "{{ data.error.join(', ') }}"
           </template>
         </div>
@@ -234,18 +272,18 @@ detectLostPath()
             item-key="pid"
           >
             <template #item="{element}">
-              <div :class='[element.error.length > 0 ? "bg-error text-error-content hover:bg-error/80" : "hover:bg-black/20", "relative flex items-center transition-all"]'>
+              <div :class='[element.error && element.error.length > 0 && story.detectErrPassage ? "bg-error text-error-content hover:bg-error/80" : "hover:bg-black/20", "relative flex items-center transition-all"]'>
                 <div v-if="search.length == 0" class="handle absolute left-3 cursor-move">
                   <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
                   </svg>
                 </div>
                 <div class="flex absolute right-3">
-                  <div class="dropdown dropdown-end">
-                    <label tabindex="0" class="btn btn-ghost btn-sm">
+                  <div class="dropdown dropdown-bottom dropdown-end">
+                    <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
                       <svg fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
-                    </label>
-                    <ul tabindex="0" class="dropdown-content menu menu-compact p-2 bg-base-100 rounded-box shadow-xl">
+                    </div>
+                    <ul class="dropdown-content z-[1] menu menu-compact p-2 bg-base-100 rounded-box shadow-xl">
                       <li>
                         <button @click="deletePassage(element.pid)" class='bg-error text-error-content'>
                           Delete
@@ -282,35 +320,41 @@ detectLostPath()
       </button>
     </router-link>
 
-    <label for='image-modal' class="btn btn-primary btn-circle cursor-pointer">
+    <button @click='openImageModal()' class="btn btn-primary btn-circle cursor-pointer">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
       </svg>
-    </label>
+    </button>
   
-    <label for='create-modal' class="btn btn-primary btn-circle cursor-pointer">
+    <button @click='openCreateModal()' class="btn btn-primary btn-circle cursor-pointer">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
-    </label>
+    </button>
   </div>
 
-  <input type="checkbox" id="create-modal" class="modal-toggle" />
-  <div class="modal modal-bottom sm:modal-middle">
+  <!-- <input type="checkbox" id="create-modal" class="modal-toggle" /> -->
+  <dialog id="create-modal" class="modal modal-bottom sm:modal-middle">
     <div class="modal-box relative">
-      <label for="create-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
+      <form method="dialog">
+        <button class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</button>
+      </form>
       <h3 class="font-bold text-lg mb-4">Passage Name...</h3>
       <input v-model="passageName" type="text" placeholder="Passage Name" class="input input-bordered w-full" />
       <div class="modal-action">
-        <label @click="addPassage()" for="create-modal" class="btn btn-success">Add Passage.</label>
+        <form method="dialog">
+          <button @click="addPassage()" class="btn btn-success">Add Passage.</button>
+        </form>
       </div>
     </div>
-  </div>
+  </dialog>
 
-  <input type="checkbox" id="image-modal" class="modal-toggle" />
-  <div class="modal modal-bottom sm:modal-middle">
+  <!-- <input type="checkbox" id="image-modal" class="modal-toggle" /> -->
+  <dialog id="image-modal" class="modal modal-bottom sm:modal-middle">
     <div class="modal-box p-0 relative">
-      <label for="image-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
+      <form method="dialog">
+        <button class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</button>
+      </form>
       <div class="p-2">
         <h3 class="font-bold text-lg mb-4">Image List...</h3>
         <div class='flex flex-col gap-2'>
@@ -348,6 +392,6 @@ detectLostPath()
         <label @click="addImageButton.click()" class="btn btn-success btn-sm">Add Image.</label>
       </div>
     </div>
-  </div>
+  </dialog>
 
 </template>

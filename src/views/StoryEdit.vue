@@ -46,6 +46,11 @@ function setName(name) {
     toaster.show(`Passage Name Is Alreadys Exist Or Empty...`, {type : 'error'})
   }
 }
+
+// Opening Modal...
+const openAdditionalModal = () => {
+  document.getElementById("additional-modal").showModal()
+}
 </script>
 
 <template>
@@ -60,6 +65,11 @@ function setName(name) {
       <div class='grow truncate'>
         <button class="btn btn-ghost normal-case px-0 text-xl m-1">Editing Passage</button>
       </div>
+      <button @click='openAdditionalModal()' tabindex="0" class="btn btn-ghost btn-square m-1">
+        <svg class="h-5 w-5 self-center m-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+        </svg>
+      </button>
     </div>
 
     <div class='w-full px-2 pb-2 flex flex-col gap-2 grow h-0'>
@@ -67,9 +77,9 @@ function setName(name) {
         <label class="label">
           <span class="label-text">Passage Names</span>
         </label>
-        <label class="input-group input-group-xs w-full">
-          <input v-model="truePassageNames" type="text" placeholder="Passage Title Must Not Empty" class="input input-bordered input-xs grow" />
-          <span v-if="passageNames != truePassageNames" @click="setName(truePassageNames)" class='cursor-pointer'>
+        <label class="join w-full">
+          <input v-model="truePassageNames" type="text" placeholder="Passage Title Must Not Empty" class="input input-bordered input-xs grow join-item" />
+          <span v-if="passageNames != truePassageNames" @click="setName(truePassageNames)" class='cursor-pointer btn btn-xs join-item'>
             <span>Set</span>
           </span>
         </label>
@@ -88,4 +98,15 @@ function setName(name) {
     </div>
 
   </div>
+
+  <dialog id="additional-modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box relative">
+      <form method="dialog">
+        <button class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</button>
+      </form>
+      <h3 class='text-xl'>Tags</h3>
+      <p class='py-1'>Write Tags To The Story Passage. Seperated By Space(s).</p>
+      <input  v-model="story.story[storyIndex].passage[passageIndex].tags" type="text" placeholder="" class="input input-bordered w-full" />
+    </div>
+  </dialog>
 </template>

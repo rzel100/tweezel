@@ -50,10 +50,10 @@ function createTheStory(data) {
       })
     }
     let dataTmpHtmlSafe = dataTmp.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    passageDataNyaTmp = '<tw-passagedata pid="'+story.story[theStory].passage[i].pid+'" name="'+story.story[theStory].passage[i].name+'" tags="" position="100,100" size="100,100">'+dataTmpHtmlSafe+'</tw-passagedata>'
+    passageDataNyaTmp = '<tw-passagedata pid="'+story.story[theStory].passage[i].pid+'" name="'+story.story[theStory].passage[i].name+'" tags="'+story.story[theStory].passage[i].tags+'" position="100,100" size="100,100">'+dataTmpHtmlSafe+'</tw-passagedata>'
     passageDataNya = passageDataNya + passageDataNyaTmp
   }
-  let realData = data.replace(/tweezelStoryTitle/g, story.story[theStory].title).replace(/tweezelStoryIfid/g, story.story[theStory].ifid).replace(/tweezelStoryStartNode/g, story.story[theStory].startNode).replace(/tweezelStoryUserStyle/g, story.story[theStory].userStyle).replace(/tweezelStoryUserScript/g, story.story[theStory].userScript).replace(/tweezelStoryPassage/g, passageDataNya).replace(/tweezelVersion/g, '1.2.2')
+  let realData = data.replace(/tweezelStoryTitle/g, story.story[theStory].title).replace(/tweezelStoryIfid/g, story.story[theStory].ifid).replace(/tweezelStoryStartNode/g, story.story[theStory].startNode).replace(/tweezelStoryUserStyle/g, story.story[theStory].userStyle).replace(/tweezelStoryUserScript/g, story.story[theStory].userScript).replace(/tweezelStoryPassage/g, passageDataNya).replace(/tweezelVersion/g, '1.3.0')
   gameCode.value = realData
 }
 if (story.story[theStory].passage.length == 0) {
@@ -209,6 +209,11 @@ function download(filename, text) {
 function exportHTML() {
   download(story.story[theStory].title, gameCode.value)
 }
+
+// Opening Modal...
+const openCloseModal = () => {
+  document.getElementById("close-modal").showModal()
+}
 </script>
 
 <template>
@@ -226,11 +231,11 @@ function exportHTML() {
 
       <div v-show="play" class="grow flex flex-col bg-white relative">
         <div class='absolute bottom-0 left-0'>
-          <label for="close-modal" tabindex="0" class="btn btn-ghost btn-square btn-xs bg-black/20">
+          <button @click='openCloseModal()' tabindex="0" class="btn btn-ghost btn-square btn-xs bg-black/20">
             <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 text-white">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </label>
+          </button>
         </div>
         <iframe id="storyWindow" class="grow" :srcdoc="gameCode" @load="gameReady()"></iframe>
       </div>
@@ -248,11 +253,9 @@ function exportHTML() {
         </div>
         <div class='p-4' v-if="isLoading">Loading The Game... Please Wait A Bit...</div>
         <div class='p-4' v-else>
-          <div class="alert alert-success shadow-lg">
-            <div>
-              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              <span>Export Completed...</span>
-            </div>
+          <div role="alert" class="alert alert-success shadow-lg flex flex-row">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>Export Completed...</span>
           </div>
           <p class='text-sm py-2'>It Will Be Saved At "[Internal_Storage] -> Android -> data -> app.rzel.tweezel -> files -> Export -> [Story Name] -> [Here]". It's Extension Is ".html"</p>
           <p class='text-sm py-2'>Nice. You Already Exported Your Game !. Go On, Upload Your Game To A Website Like Itch.io Or Your Own Website !. Or Simply Share It To Your Friends And Have Them Play Your Game !.</p>
@@ -261,17 +264,21 @@ function exportHTML() {
 
     </div>
 
-    <input type="checkbox" id="close-modal" class="modal-toggle" />
-    <div class="modal modal-bottom sm:modal-middle">
+    <!-- <input type="checkbox" id="close-modal" class="modal-toggle" /> -->
+    <dialog id="close-modal" class="modal modal-bottom sm:modal-middle">
       <div class="modal-box relative">
-        <label for="close-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
+        <form method='dialog'>
+          <button class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</button>
+        </form>
         <h3 class="font-bold text-lg mb-4">Quit Preview...???</h3>
         <div class="modal-action">
-          <label for="close-modal" class="btn btn-ghost">No.</label>
-          <label @click="$router.back()" for="create-modal" class="btn btn-success">Yes.</label>
+          <form method='dialog'>
+            <button class="btn btn-ghost">No.</button>
+          </form>
+          <button @click="$router.back()" for="create-modal" class="btn btn-success">Yes.</button>
         </div>
       </div>
-    </div>
+    </dialog>
 
   </div>
 </template>

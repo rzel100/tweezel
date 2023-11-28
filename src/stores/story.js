@@ -11,6 +11,7 @@ export const storyData = defineStore({
     playState: "play",
     isWrap: false,
     askInstall: true,
+    detectErrPassage: true,
     innerHeight: 0,
     playedStory: [],
     theme: "business",

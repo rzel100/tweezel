@@ -173,3 +173,29 @@ List Addition / Changes :
 
 - Fix Import Backup.
 - The App Will Detect Any Broken Path Now.
+
+## 1.2.3
+
+Date : 25-August-2023
+
+> Small Update.
+
+List Addition / Changes :
+
+- Fix Missing Path Detection For `->` And `<-`.
+
+## 1.3.0
+
+Date : 28-November-2023
+
+> major Update.
+
+List Addition / Changes :
+
+- Fix Missing Path Detection For `->` And `<-`.
+- Update The DaisyUI To The Newest Ver (4.4.10).
+- Update The DaisiUI Layout About The Update.
+- Add Additional Condition For Path Detection.
+- Add The Passage Error Detection Toggle. (Maybe U Don't Wanna Enable This Because U Know What Are U Doing Or My Passage Error Detection Behave Badly. :P Sorry.)
+- Add The Tags Editor On Passage.
+- Now Search Can Search Both Passage Name And Passage Tags.

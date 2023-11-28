@@ -205,6 +205,20 @@ let filteredStory = computed(() =>
         .includes(search.value.toLowerCase().replace(/\s+/g, ''))
       )
 )
+
+const changeDetectPassage = (data) => {
+  story.detectErrPassage = data
+}
+// Opening Modal...
+const openCreateModal = () => {
+  document.getElementById("create-modal").showModal()
+}
+const openSettingModal = () => {
+  document.getElementById("setting-modal").showModal()
+}
+const openAboutModal = () => {
+  document.getElementById("about-modal").showModal()
+}
 </script>
 
 <template>
@@ -213,22 +227,22 @@ let filteredStory = computed(() =>
       <div class='flex-1'>
         <button class="btn btn-ghost normal-case text-xl">TweezeL</button>
       </div>
-      <div class="dropdown dropdown-end">
-        <label tabindex="0" class="btn btn-ghost btn-square m-1">
+      <div class="dropdown dropdown-bottom dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-square m-1">
           <svg fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
-        </label>
-        <ul tabindex="0" class="dropdown-content menu p-2 rounded-box shadow-xl bg-primary mt-4">
-          <li class="p-1"><label for="setting-modal">Setting</label></li>
-          <li class="p-1"><label for="about-modal">About</label></li>
+        </div>
+        <ul class="dropdown-content z-[1] menu p-2 rounded-box shadow-xl bg-primary mt-4">
+          <li class="p-1"><button @click='openSettingModal()'>Setting</button></li>
+          <li class="p-1"><button @click='openAboutModal()'>About</button></li>
           <li class="p-1" v-if="installPromptMain"><label @click="installPromptMain.prompt()">Install</label></li>
         </ul>
       </div>
     </div>
 
     <div class="form-control p-2">
-      <label class="input-group input-group-xs w-full">
-        <input v-model="search" type="text" placeholder="Search" class="input input-bordered input-xs grow" />
-        <span @click="search = ''" class='cursor-pointer'>
+      <label class="join w-full">
+        <input v-model="search" type="text" placeholder="Search" class="input input-bordered input-xs grow join-item" />
+        <span @click="search = ''" class='cursor-pointer join-item btn btn-xs'>
           <svg v-if="search.length > 0" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           <svg v-else class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
         </span>
@@ -251,11 +265,11 @@ let filteredStory = computed(() =>
                   </svg>
                 </div>
                 <div class="flex absolute right-3">
-                  <div class="dropdown dropdown-end">
-                    <label tabindex="0" class="btn btn-ghost btn-sm">
+                  <div class="dropdown dropdown-bottom dropdown-end">
+                    <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
                       <svg fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
-                    </label>
-                    <ul tabindex="0" class="dropdown-content menu menu-compact p-2 bg-base-100 rounded-box shadow-xl">
+                    </div>
+                    <ul class="dropdown-content z-[1] menu menu-compact p-2 bg-base-100 rounded-box shadow-xl">
                       <li>
                         <button @click="deleteStory(element.ifid)" class='bg-error text-error-content'>
                           Delete
@@ -275,28 +289,34 @@ let filteredStory = computed(() =>
     </div>
   </div>
 
-  <label for='create-modal' class="btn btn-primary btn-circle absolute bottom-5 right-5 cursor-pointer">
+  <div @click='openCreateModal()' class="btn btn-primary btn-circle absolute bottom-5 right-5 cursor-pointer">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
     </svg>
-  </label>
+  </div>
 
-  <input type="checkbox" id="create-modal" class="modal-toggle" />
-  <div class="modal modal-bottom sm:modal-middle">
+  <!-- <input type="checkbox" id="create-modal" class="modal-toggle" /> -->
+  <dialog id="create-modal" class="modal modal-bottom sm:modal-middle">
     <div class="modal-box relative">
-      <label for="create-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
+      <form method="dialog">
+        <button class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</button>
+      </form>
       <h3 class="font-bold text-lg mb-4">Write An Amazing Title For Your Story...</h3>
       <input v-model="storyName" type="text" placeholder="Story Title" class="input input-bordered w-full" />
       <div class="modal-action">
-        <label @click="createStory()" for="create-modal" class="btn btn-success">Start Creating !.</label>
+        <form method="dialog">
+          <button @click="createStory()" class="btn btn-success">Start Creating !.</button>
+        </form>
       </div>
     </div>
-  </div>
+  </dialog>
 
-  <input type="checkbox" id="setting-modal" class="modal-toggle" />
-  <div class="modal modal-bottom sm:modal-middle">
+  <!-- <input type="checkbox" id="setting-modal" class="modal-toggle" /> -->
+  <dialog id="setting-modal" class="modal modal-bottom sm:modal-middle">
     <div class="modal-box relative">
-      <label for="setting-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
+      <form method="dialog">
+        <button class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</button>
+      </form>
 
       <div class='divider text-xl'>Setting</div>
 
@@ -320,6 +340,13 @@ let filteredStory = computed(() =>
 
       <div class='divider'></div>
 
+      <label class='label cursor-pointer bg-base-100 rounded-md py2'>
+        Detect Error Passage ?. (Experimental)
+        <input type="checkbox" class="toggle" :checked='story.detectErrPassage' @change='changeDetectPassage($event.target.checked)' />
+      </label>
+
+      <div class='divider'></div>
+
       <p class='text-base py-2'>Load Story From Backup.</p>
       <p class='text-sm py-2'>IF THE STORY IS ALREADY EXIST. THIS WILL REPLACE IT !.</p>
       <button @click='loadStory.click()' class='btn btn-primary btn-block btn-sm'>Choose Story Backup To Load.</button>
@@ -339,12 +366,14 @@ let filteredStory = computed(() =>
       <button @click='loadWholeStory.click()' class='btn btn-primary btn-block btn-sm'>Choose Whole Story Backup To Load.</button>
       <input @change='readWholeData' class="h-0 w-0" type="file" id="jsonwholestoryfileinput" ref='loadWholeStory' accept='.tweezeldata' />
     </div>
-  </div>
+  </dialog>
 
-  <input type="checkbox" id="about-modal" class="modal-toggle" />
-  <div class="modal modal-bottom sm:modal-middle">
+  <!-- <input type="checkbox" id="about-modal" class="modal-toggle" /> -->
+  <dialog id="about-modal" class="modal modal-bottom sm:modal-middle">
     <div class="modal-box relative">
-      <label for="about-modal" class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</label>
+      <form method="dialog">
+        <button class="btn btn-error btn-sm btn-circle btn-ghost absolute right-2 top-2 text-error">✕</button>
+      </form>
       <p class="p-1 mt-2">TweezeL Is A Free Tools For Creating Twine Games Focused For Android. But It Quite Works Well On Any Device With Browser On It. :3.</p>
       <p class="p-1 mt-2">The Feature Is Not Good Like Twine Or Tweego. But At Least It's Device Friendly Than Twine. And User Friendly Than Tweego. :)</p>
       <p class="p-1 mt-2">Now This Tools Already Support All Official Listed Story Formats On Twine 2 Tools. Such As Chapbook, Harlowe, Snowman, And Sugarcube.</p>
@@ -355,8 +384,10 @@ let filteredStory = computed(() =>
       <p class="p-1 mt-2">This Tools Is More Or Less Like Tweego But With GUI. For Those Who Never Code Twine Games With Tweego And Wanna Try This Tools.<br>
         Just Create A New Story To Read Some Very Basic Tutorial :).<br>
         Or <a class="text-primary-content underline" href="https://www.youtube.com/playlist?list=PLb4OE-UTEU-86vltmWTJTBkbYEWbGSebe" target="_blank" rel="noopener noreferrer">Go To Here.</a> It's My Youtube Playlist. Some Video About This Project. Like Basic Tutorial And Such Things.</p>
-      <label for="about-modal" class="btn btn-success btn-block btn-sm mt-2">Happy Creating !.</label>
+      <form method="dialog">
+        <button class="btn btn-success btn-block btn-sm mt-2">Happy Creating !.</button>
+      </form>
     </div>
-  </div>
+  </dialog>
 
 </template>

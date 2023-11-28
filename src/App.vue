@@ -31,7 +31,7 @@ story.innerHeight = window.innerHeight
 <template>
   <div class="font-sans h-screen relative" :style='{height: story.innerHeight + "px"}' :data-theme='story.theme'>
     <div v-if="installPrompt" class='absolute bottom-0 w-full flex justify-center items-center p-2 z-50'>
-      <div class="alert alert-success shadow-lg">
+      <div role='alert' class="alert alert-success shadow-lg flex flex-row">
         <div>
           <span>Install TweezeL To Ur Device !. It Doesn't Take Storage And Work Offline !.</span>
         </div>
