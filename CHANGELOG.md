@@ -188,7 +188,7 @@ List Addition / Changes :
 
 Date : 28-November-2023
 
-> major Update.
+> Major Update.
 
 List Addition / Changes :
 
