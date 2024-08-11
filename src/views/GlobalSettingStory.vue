@@ -6,8 +6,6 @@ import { Codemirror } from 'vue-codemirror'
 import { oneDark } from '@codemirror/theme-one-dark'
 import {css} from '@codemirror/lang-css'
 import {javascript} from '@codemirror/lang-javascript'
-import {Directory} from "@capacitor/filesystem";
-import write_blob from "capacitor-blob-writer";
 import { createToaster } from "@meforma/vue-toaster";
 const toaster = createToaster({
   position : 'top',
@@ -30,6 +28,10 @@ const listStoryFormats = ref([
   {
     name : 'Chapbook 1.2.1',
     val : 'chapbook-1'
+  },
+  {
+    name : 'Chapbook 2.2.0',
+    val : 'chapbook-2'
   },
   {
     name : 'Harlowe 3.2.3',
@@ -56,9 +58,13 @@ const listStoryFormats = ref([
     val : 'sugarcube-2'
   },
   {
-    name : 'SugarCube 1.0.35',
-    val : 'sugarcube-1'
+    name : 'Custom',
+    val : 'custom'
   },
+  // {
+  //   name : 'SugarCube 1.0.35',
+  //   val : 'sugarcube-1'
+  // },
 ])
 
 // let nameList = dataName.value.map(function(data){
@@ -83,27 +89,38 @@ const cleaningString = (text) => {
   return replaced
 }
 
-const writeFile = async (blob, filename, original_filename) => {
-  write_blob({
-    path: "Backup/"+original_filename+"/"+filename,
-    directory: Directory.External,
-    blob: blob,
-    recursive: true,
-    on_fallback() {
-      toaster.error(`Failed...`)
-    }
-  }).then(function () {
-    toaster.success(`Done...`)
-  });
-};
+// const writeFile = async (blob, filename, original_filename) => {
+//   write_blob({
+//     path: "Backup/"+original_filename+"/"+filename,
+//     directory: Directory.External,
+//     blob: blob,
+//     recursive: true,
+//     on_fallback() {
+//       toaster.error(`Failed...`)
+//     }
+//   }).then(function () {
+//     toaster.success(`Done...`)
+//   });
+// };
 
 function download(filename, text) {
   const new_filename = cleaningString(filename)
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const d = new Date();
-  const blob = new Blob([text], { type : 'plain/text' });
-  const fileName = new_filename+' '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+'.tweezeldata'
-  writeFile(blob, fileName, new_filename)
+  const fileName = new_filename+'_'+d.getDate()+'_'+months[d.getMonth()]+'_'+d.getFullYear()+'.tweezeldata'
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', fileName);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+  toaster.success(`Done...`)
+  // const new_filename = cleaningString(filename)
+  // const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  // const d = new Date();
+  // const blob = new Blob([text], { type : 'plain/text' });
+  // writeFile(blob, fileName, new_filename)
 }
 </script>
 
@@ -146,6 +163,9 @@ function download(filename, text) {
         <div v-if="story.story[theStory].storyformats == 'chapbook-1'">
           A Twine story format emphasizing ease of authoring, multimedia, and playability on many different types of devices. Visit the <a class="text-primary underline" href="https://klembot.github.io/chapbook/guide/" target="_blank" rel="noopener noreferrer">guide</a> for more information.
         </div>
+        <div v-if="story.story[theStory].storyformats == 'chapbook-2'">
+          A Twine story format emphasizing ease of authoring, multimedia, and playability on many different types of devices. Visit the <a class="text-primary underline" href="https://klembot.github.io/chapbook/guide/" target="_blank" rel="noopener noreferrer">guide</a> for more information.
+        </div>
         <div v-if="story.story[theStory].storyformats == 'harlowe-3'">
           The default story format for Twine 2. Consult its <a class="text-primary underline" href="https://twine2.neocities.org/" target="_blank" rel="noopener noreferrer">documentation</a>.<br>
           <br>
@@ -176,6 +196,10 @@ function download(filename, text) {
           A Twine 2 port of the Twine 1 story format by the same name. See its <a class="text-primary underline" href="http://www.motoslave.net/sugarcube/1/#documentation" target="_blank" rel="noopener noreferrer">documentation</a>.<br>
           <br>
           License: Simplified BSD License
+        </div>
+        <div v-if="story.story[theStory].storyformats == 'custom'">
+          Write the url to the format.js.
+          <input v-model="story.story[theStory].customFormatUrl" type="text" placeholder="Write the url" class="input input-bordered w-full" />
         </div>
         <div v-if="!story.story[theStory].storyformats">
           Choose Story Formats. To See It's Descriptions And Link To It's Documentations.

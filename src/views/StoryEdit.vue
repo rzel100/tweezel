@@ -88,11 +88,11 @@ const openAdditionalModal = () => {
         <codemirror
           v-model="story.story[storyIndex].passage[passageIndex].data"
           placeholder="Write The Code Here..."
-          :style="{ 'flex-grow' : '1' }"
+          :style="{ 'flex-grow' : '1', 'background-color' : story.codeDarkTheme ? '' : 'white', 'color' : story.codeDarkTheme ? '' : 'black'}"
           :autofocus="true"
           :indent-with-tab="true"
           :tab-size="2"
-          :extensions="extensions"
+          :extensions="story.codeDarkTheme ? extensions : []"
         />
       </div>
     </div>

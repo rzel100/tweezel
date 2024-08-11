@@ -14,6 +14,7 @@ export const storyData = defineStore({
     detectErrPassage: true,
     innerHeight: 0,
     playedStory: [],
+    codeDarkTheme: true,
     theme: "business",
     themeList: [
       "garden",

@@ -199,3 +199,18 @@ List Addition / Changes :
 - Add The Passage Error Detection Toggle. (Maybe U Don't Wanna Enable This Because U Know What Are U Doing Or My Passage Error Detection Behave Badly. :P Sorry.)
 - Add The Tags Editor On Passage.
 - Now Search Can Search Both Passage Name And Passage Tags.
+
+## 1.4.0
+
+Date : 11-August-2024
+
+> major Update.
+
+List Addition / Changes :
+
+- Now The App Will Be Smaller And Faster Load Due To Using Online Story Format Than Local Story Formats.
+- Experimental : Now You Can Use Custom Story Formats. (Tested Only To Official Story Formats. Maybe Not Work At All.)
+- Added Error Toast When Failing Load Story Formats.
+- Removing Android Build. Too Much Work. Go Back To Old Web Based.
+- Now Using Github Pages For Website Build.
+- Now Code Editor Have Dark And Light Theme. Who Choose Light Theme ?. Light Attract Bugs. :) That's Why Default Is Dark Theme.

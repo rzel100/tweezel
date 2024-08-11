@@ -5,9 +5,8 @@ This Tools Build With **VueJS 3 + Tailwind Css + Daisy UI** For Styling.
 
 Link Tools :
 
-- https://tweezel.netlify.app
-- https://rzel.itch.io/tweezel
-- NEW...!!! Android...!!! https://play.google.com/store/apps/details?id=app.rzel.tweezel
+- [Github Pages](https://rzel100.github.io/tweezel-web/)
+- ~NEW...!!! Android...!!! https://play.google.com/store/apps/details?id=app.rzel.tweezel~ Next Update Will Remove It From Playstore...
 
 Now Support All Official Listed Story Formats On Twine 2.  
 Such As Chapbook, Harlowe, Snowman, And Sugarcube.
@@ -40,9 +39,11 @@ Give It A Try. :3.
 - [x] New Icon !. Thanks To My Friend...
 - [x] Many Daisy UI Theme Now... Try It Out...
 - [x] New Code Editor... Using Code Mirror... :)
-- [x] Now It Released On Play Store... Try It Out...
+- [x] ~Now It Released On Play Store... Try It Out...~
 - [x] You Can Import Image Now... And Use It On Your Story...
 - [x] Error Detection... It Will Notice You Where The Passage Path Error On The Story...
+- [x] Now It Use Online Source Of Story Formats Instead Of Local...
+- [x] Experimental : Now You Can Use Custom Story Formats. (Probably Not Work At All... Tested Only To Official Format...)
 
 <hr>
 

@@ -4,8 +4,8 @@ import { RouterLink } from 'vue-router'
 import draggable from 'vuedraggable'
 import { createToaster } from "@meforma/vue-toaster";
 import { storyData } from '@/stores/story'
-import {Directory} from "@capacitor/filesystem";
-import write_blob from "capacitor-blob-writer";
+// import {Directory} from "@capacitor/filesystem";
+// import write_blob from "capacitor-blob-writer";
 const story = storyData()
 const storyName = ref('')
 const isNew = ref(false)
@@ -72,7 +72,8 @@ function createStory() {
       userStyle : '/* Design Your Styling In Here */',
       userScript : '// Type Your Own Javascript In Here',
       storyformats : 'sugarcube-2',
-      imageList : [],
+      imageList: [],
+      customFormatUrl: '',
       passage : [
         {
           name : 'start',
@@ -172,27 +173,34 @@ const cleaningString = (text) => {
   return replaced
 }
 
-const writeFile = async (blob, filename) => {
-  write_blob({
-    path: "Global_Backup/"+filename,
-    directory: Directory.External,
-    blob: blob,
-    recursive: true,
-    on_fallback() {
-      toaster.error(`Failed...`)
-    }
-  }).then(function () {
-    toaster.success(`Done...`)
-  });
-};
+// const writeFile = async (blob, filename) => {
+//   write_blob({
+//     path: "Global_Backup/"+filename,
+//     directory: Directory.External,
+//     blob: blob,
+//     recursive: true,
+//     on_fallback() {
+//       toaster.error(`Failed...`)
+//     }
+//   }).then(function () {
+//     toaster.success(`Done...`)
+//   });
+// };
 
 function download(filename, text) {
   const new_filename = cleaningString(filename)
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const d = new Date();
-  const blob = new Blob([text], { type : 'plain/text' });
-  const fileName = new_filename+' '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+'.tweezeldata'
-  writeFile(blob, fileName)
+  // const blob = new Blob([text], { type : 'plain/text' });
+  const fileName = new_filename+'_'+d.getDate()+'_'+months[d.getMonth()]+'_'+d.getFullYear()+'.tweezeldata'
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', fileName);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+  toaster.success(`Done...`)
 }
 
 let filteredStory = computed(() =>
@@ -208,6 +216,9 @@ let filteredStory = computed(() =>
 
 const changeDetectPassage = (data) => {
   story.detectErrPassage = data
+}
+const changeCodeDarkTheme = (data) => {
+  story.codeDarkTheme = data
 }
 // Opening Modal...
 const openCreateModal = () => {
@@ -337,6 +348,13 @@ const openAboutModal = () => {
       </div>
 
       <button @click='refreshStory()' class='btn btn-primary btn-block btn-sm mt-2'>Refresh Theme List ?.</button>
+
+      <div class='divider'></div>
+
+      <label class='label cursor-pointer bg-base-100 rounded-md py2'>
+        Code In Dark Theme
+        <input type="checkbox" class="toggle" :checked='story.codeDarkTheme' @change='changeCodeDarkTheme($event.target.checked)' />
+      </label>
 
       <div class='divider'></div>
 

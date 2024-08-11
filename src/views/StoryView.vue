@@ -109,7 +109,6 @@ const detectLostPath = () => {
           let theFound = found.replaceAll('[[', '').replaceAll(']]', '').split("|")
           let theFoundPath = ''
           if (theFound.length < 2) {
-            console.log(theFound)
             if (theFound[0].includes('<-')) {
               theFoundPath = readSquare(theFound[0].split('<-')[0].trim())
             } else if (theFound[0].includes('->')) {
