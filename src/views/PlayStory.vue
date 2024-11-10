@@ -2,9 +2,6 @@
 import { useRoute } from 'vue-router'
 import { storyData } from '@/stores/story'
 import { ref, watch } from 'vue';
-// import {Directory} from "@capacitor/filesystem";
-// import {Capacitor} from "@capacitor/core";
-// import write_blob from "capacitor-blob-writer";
 import { createToaster } from "@meforma/vue-toaster";
 const toaster = createToaster({
   position : 'top',
@@ -17,7 +14,7 @@ const theIfid = route.params.id
 const findIfid = (element) => element.ifid == theIfid;
 const theStory = story.story.findIndex(findIfid)
 
-const tweezelVersion = '1.4.0'
+const tweezelVersion = '1.5.0'
 
 // const chapbook_1 = new URL('./chapbook-1-temp.txt', import.meta.url).href
 // const harlowe_1 = new URL('./harlowe-1-temp.txt', import.meta.url).href
@@ -27,15 +24,15 @@ const tweezelVersion = '1.4.0'
 // const snowman_2 = new URL('./snowman-2-temp.txt', import.meta.url).href
 // const sugarcube_1 = new URL('./sugarcube-1-temp.txt', import.meta.url).href
 // const sugarcube_2 = new URL('./sugarcube-2-temp.txt', import.meta.url).href
-const chapbook_1 = "https://raw.githubusercontent.com/klembot/twinejs/dc8aaeae7c3c279e12f04f74093e315027b8e15d/public/story-formats/chapbook-1.2.3/format.js"
-const chapbook_2 = "https://raw.githubusercontent.com/klembot/twinejs/911d18bc4994f1648137da4cacb66fced9086f6f/public/story-formats/chapbook-2.2.0/format.js"
-const harlowe_1 = "https://raw.githubusercontent.com/klembot/twinejs/28074261074cf22e46779c0efc2442afe015b74c/public/story-formats/harlowe-2.1.0/format.js"
-const harlowe_2 = "https://raw.githubusercontent.com/klembot/twinejs/28074261074cf22e46779c0efc2442afe015b74c/public/story-formats/harlowe-2.1.0/format.js"
-const harlowe_3 = "https://raw.githubusercontent.com/klembot/twinejs/60c3cadc308ec9ceafb0406c5c1ef58eaa828d2e/public/story-formats/harlowe-3.3.9/format.js"
-const snowman_1 = "https://raw.githubusercontent.com/klembot/twinejs/dd79dc7073115b1acfc82f25dace9838c241e056/public/story-formats/snowman-1.4.0/format.js"
-const snowman_2 = "https://raw.githubusercontent.com/klembot/twinejs/dd79dc7073115b1acfc82f25dace9838c241e056/public/story-formats/snowman-2.0.2/format.js"
-const sugarcube_1 = "https://raw.githubusercontent.com/klembot/twinejs/c5a2c90b86bb1d3d50169b0fe3988d3434c23127/public/story-formats/sugarcube-1.0.35/format.js"
-const sugarcube_2 = "https://raw.githubusercontent.com/klembot/twinejs/b2f8717bde8f0ef16ca78d9b99b6139c3bd05321/public/story-formats/sugarcube-2.37.3/format.js"
+// const chapbook_1 = "https://raw.githubusercontent.com/klembot/twinejs/dc8aaeae7c3c279e12f04f74093e315027b8e15d/public/story-formats/chapbook-1.2.3/format.js"
+// const chapbook_2 = "https://raw.githubusercontent.com/klembot/twinejs/911d18bc4994f1648137da4cacb66fced9086f6f/public/story-formats/chapbook-2.2.0/format.js"
+// const harlowe_1 = "https://raw.githubusercontent.com/klembot/twinejs/28074261074cf22e46779c0efc2442afe015b74c/public/story-formats/harlowe-2.1.0/format.js"
+// const harlowe_2 = "https://raw.githubusercontent.com/klembot/twinejs/28074261074cf22e46779c0efc2442afe015b74c/public/story-formats/harlowe-2.1.0/format.js"
+// const harlowe_3 = "https://raw.githubusercontent.com/klembot/twinejs/60c3cadc308ec9ceafb0406c5c1ef58eaa828d2e/public/story-formats/harlowe-3.3.9/format.js"
+// const snowman_1 = "https://raw.githubusercontent.com/klembot/twinejs/dd79dc7073115b1acfc82f25dace9838c241e056/public/story-formats/snowman-1.4.0/format.js"
+// const snowman_2 = "https://raw.githubusercontent.com/klembot/twinejs/dd79dc7073115b1acfc82f25dace9838c241e056/public/story-formats/snowman-2.0.2/format.js"
+// const sugarcube_1 = "https://raw.githubusercontent.com/klembot/twinejs/c5a2c90b86bb1d3d50169b0fe3988d3434c23127/public/story-formats/sugarcube-1.0.35/format.js"
+// const sugarcube_2 = "https://raw.githubusercontent.com/klembot/twinejs/b2f8717bde8f0ef16ca78d9b99b6139c3bd05321/public/story-formats/sugarcube-2.37.3/format.js"
 
 const gameCode = ref('')
 const play = ref(false)
@@ -78,178 +75,7 @@ if (!story.story[theStory].storyformats) {
   errornya.value.push('Story Formats Is Not Set. Set First In Global Story Setting.')
 }
 
-if (story.story[theStory].storyformats == 'chapbook-1') {
-  fetch(chapbook_1)
-    .then(response => response.text())
-    .then(data => {
-      let result = ''
-      if (data.split(`"setup": function(){`).length > 1) {
-        result = data.split(`"setup": function(){`)[0].slice(0, -1) + '}'
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      } else {
-        result = data.substring(data.length - 1) == ";" ? data.slice(0, -2) : data.slice(0, -1)
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      }
-      createTheStory(result)
-    }).catch((error) => {
-      toaster.error(`Something wrong... Check your internet connection...`)
-      console.log('error', error)
-    });
-} else if (story.story[theStory].storyformats == 'chapbook-2') {
-  fetch(chapbook_2)
-    .then(response => response.text())
-    .then(data => {
-      let result = ''
-      if (data.split(`"setup": function(){`).length > 1) {
-        result = data.split(`"setup": function(){`)[0].slice(0, -1) + '}'
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      } else {
-        result = data.substring(data.length - 1) == ";" ? data.slice(0, -2) : data.slice(0, -1)
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      }
-      createTheStory(result)
-    }).catch((error) => {
-      toaster.error(`Something wrong... Check your internet connection...`)
-      console.log('error', error)
-    });
-} else if (story.story[theStory].storyformats == 'harlowe-1') {
-  fetch(harlowe_1)
-    .then(response => response.text())
-    .then(data => {
-      let result = ''
-      if (data.split(`"setup": function(){`).length > 1) {
-        result = data.split(`"setup": function(){`)[0].slice(0, -1) + '}'
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      } else {
-        result = data.substring(data.length - 1) == ";" ? data.slice(0, -2) : data.slice(0, -1)
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      }
-      createTheStory(result)
-    }).catch((error) => {
-      toaster.error(`Something wrong... Check your internet connection...`)
-      console.log('error', error)
-    });
-} else if (story.story[theStory].storyformats == 'harlowe-2') {
-  fetch(harlowe_2)
-    .then(response => response.text())
-    .then(data => {
-      let result = ''
-      if (data.split(`"setup": function(){`).length > 1) {
-        result = data.split(`"setup": function(){`)[0].slice(0, -1) + '}'
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      } else {
-        result = data.substring(data.length - 1) == ";" ? data.slice(0, -2) : data.slice(0, -1)
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      }
-      createTheStory(result)
-    }).catch((error) => {
-      toaster.error(`Something wrong... Check your internet connection...`)
-      console.log('error', error)
-    });
-} else if (story.story[theStory].storyformats == 'harlowe-3') {
-  fetch(harlowe_3)
-    .then(response => response.text())
-    .then(data => {
-      let result = ''
-      if (data.split(`"setup": function(){`).length > 1) {
-        result = data.split(`"setup": function(){`)[0].slice(0, -1) + '}'
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      } else {
-        result = data.substring(data.length - 1) == ";" ? data.slice(0, -2) : data.slice(0, -1)
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      }
-      createTheStory(result)
-    }).catch((error) => {
-      toaster.error(`Something wrong... Check your internet connection...`)
-      console.log('error', error)
-    });
-} else if (story.story[theStory].storyformats == 'snowman-1') {
-  fetch(snowman_1)
-    .then(response => response.text())
-    .then(data => {
-      let result = ''
-      if (data.split(`"setup": function(){`).length > 1) {
-        result = data.split(`"setup": function(){`)[0].slice(0, -1) + '}'
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      } else {
-        result = data.substring(data.length - 1) == ";" ? data.slice(0, -2) : data.slice(0, -1)
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      }
-      createTheStory(result)
-    }).catch((error) => {
-      toaster.error(`Something wrong... Check your internet connection...`)
-      console.log('error', error)
-    });
-} else if (story.story[theStory].storyformats == 'snowman-2') {
-  fetch(snowman_2)
-    .then(response => response.text())
-    .then(data => {
-      let result = ''
-      if (data.split(`"setup": function(){`).length > 1) {
-        result = data.split(`"setup": function(){`)[0].slice(0, -1) + '}'
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      } else {
-        result = data.substring(data.length - 1) == ";" ? data.slice(0, -2) : data.slice(0, -1)
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      }
-      createTheStory(result)
-    }).catch((error) => {
-      toaster.error(`Something wrong... Check your internet connection...`)
-      console.log('error', error)
-    });
-} else if (story.story[theStory].storyformats == 'sugarcube-1') {
-  fetch(sugarcube_1)
-    .then(response => response.text())
-    .then(data => {
-      let result = ''
-      if (data.split(`"setup": function(){`).length > 1) {
-        result = data.split(`"setup": function(){`)[0].slice(0, -1) + '}'
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      } else {
-        result = data.substring(data.length - 1) == ";" ? data.slice(0, -2) : data.slice(0, -1)
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      }
-      createTheStory(result)
-    }).catch((error) => {
-      toaster.error(`Something wrong... Check your internet connection...`)
-      console.log('error', error)
-    });
-} else if (story.story[theStory].storyformats == 'sugarcube-2') {
-  fetch(sugarcube_2)
-    .then(response => response.text())
-    .then(data => {
-      let result = ''
-      if (data.split(`"setup": function(){`).length > 1) {
-        result = data.split(`"setup": function(){`)[0].slice(0, -1) + '}'
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      } else {
-        result = data.substring(data.length - 1) == ";" ? data.slice(0, -2) : data.slice(0, -1)
-        result = result.slice(19); 
-        result = JSON.parse(result)
-      }
-      createTheStory(result)
-    }).catch((error) => {
-      toaster.error(`Something wrong... Check your internet connection...`)
-      console.log('error', error)
-    });
-} else if (story.story[theStory].storyformats == 'custom') {
+if (story.story[theStory].storyformats == 'custom') {
   fetch(story.story[theStory].customFormatUrl)
     .then(response => response.text())
     .then(data => {
@@ -268,44 +94,20 @@ if (story.story[theStory].storyformats == 'chapbook-1') {
       toaster.error(`Something wrong... Check your internet connection...`)
       console.log('error', error)
     });
+} else {
+  story.storyFormatList.forEach(storyFormat => {
+    if (storyFormat.val == story.story[theStory].storyformats && storyFormat.data) {
+      createTheStory(storyFormat.data)
+    }
+  });
 }
 
 function gameReady() {
   isLoading.value = false
   if (story.playState == 'play') {
     play.value = true
-    // if (theImages.value.length > 0) {
-    //   theImages.value.map((e, i) => {
-    //     const macan = theImagesId.value
-    //     toaster.success(`ada id Browaokowa... ${macan} ${i} ${macan[i]}`)
-    //     let theEl = document.getElementById('storyWindow').contentWindow.document.getElementById(`${macan[i]}`)
-    //     // theEl.src = Capacitor.convertFileSrc(e);
-    //     theEl.src = 'https://www.gravatar.com/avatar/hkjjasd0?d=monsterid&f=y'
-    //     if (theEl) {
-    //       toaster.success(`ada id... ${theEl.src}`)
-    //     }
-    //   })
-    // }
   }
 }
-
-// watch(() => theImages.value, (theImag) => {
-//   if (theImag.length === 0) {
-//     return
-//   }
-//   if (theImag.length > 0) {
-//     theImag.map((e, i) => {
-//       const macan = theImagesId.value
-//       toaster.success(`ada id Browaokowa... ${macan}`)
-//                // document.getElementById("storyWindow").contentWindow.document.getElementById("macan-bogeng")
-//       let theEl = document.getElementById('storyWindow').contentWindow.document.getElementById(`${theImagesId.value[i]}`)
-//       theEl.src = Capacitor.convertFileSrc(e);
-//       if (theEl) {
-//         toaster.success(`ada id... ${theEl.src}`)
-//       }
-//     })
-//   }
-// })
 
 watch(() => gameCode.value, (gameCode) => {
   if (gameCode.length === 0) {
@@ -422,8 +224,8 @@ const openCloseModal = () => {
             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             <span>Export Completed...</span>
           </div>
-          <p class='text-sm py-2'>It Will Be Saved At "[Internal_Storage] -> Android -> data -> app.rzel.tweezel -> files -> Export -> [Story Name] -> [Here]". It's Extension Is ".html"</p>
-          <p class='text-sm py-2'>Nice. You Already Exported Your Game !. Go On, Upload Your Game To A Website Like Itch.io Or Your Own Website !. Or Simply Share It To Your Friends And Have Them Play Your Game !.</p>
+          <!-- <p class='text-sm py-2'>It Will Be Saved At "[Internal_Storage] -> Android -> data -> app.rzel.tweezel -> files -> Export -> [Story Name] -> [Here]". It's Extension Is ".html"</p>
+          <p class='text-sm py-2'>Nice. You Already Exported Your Game !. Go On, Upload Your Game To A Website Like Itch.io Or Your Own Website !. Or Simply Share It To Your Friends And Have Them Play Your Game !.</p> -->
         </div>
       </div>
 

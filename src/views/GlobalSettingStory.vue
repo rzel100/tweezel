@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { storyData } from '@/stores/story'
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Codemirror } from 'vue-codemirror'
 import { oneDark } from '@codemirror/theme-one-dark'
 import {css} from '@codemirror/lang-css'
@@ -13,60 +13,65 @@ const toaster = createToaster({
   dismissible : true
 });
 
-const extensionsCss = [oneDark, css()]
-const extensionsJavascript = [oneDark, javascript()]
 const story = storyData()
 const route = useRoute()
 const mode = ref('setting')
 const theIfid = route.params.id
 const findIfid = (element) => element.ifid == theIfid;
 const theStory = story.story.findIndex(findIfid)
+const extensionsCss = [css()]
+const extensionsJavascript = [javascript()]
+
+if (story.codeDarkTheme) {
+  extensionsCss.push(oneDark)
+  extensionsJavascript.push(oneDark)
+}
 // const storyNames = ref(story.story[theStory].title)
 // const trueStoryNames = storyNames.value
 // const dataName = ref(story.story)
-const listStoryFormats = ref([
-  {
-    name : 'Chapbook 1.2.1',
-    val : 'chapbook-1'
-  },
-  {
-    name : 'Chapbook 2.2.0',
-    val : 'chapbook-2'
-  },
-  {
-    name : 'Harlowe 3.2.3',
-    val : 'harlowe-3'
-  },
-  {
-    name : 'Harlowe 2.1.0',
-    val : 'harlowe-2'
-  },
-  {
-    name : 'Harlowe 1.2.4',
-    val : 'harlowe-1'
-  },
-  {
-    name : 'Snowman 2.0.2',
-    val : 'snowman-2'
-  },
-  {
-    name : 'Snowman 1.4.0',
-    val : 'snowman-1'
-  },
-  {
-    name : 'SugarCube 2.36.1',
-    val : 'sugarcube-2'
-  },
-  {
-    name : 'Custom',
-    val : 'custom'
-  },
-  // {
-  //   name : 'SugarCube 1.0.35',
-  //   val : 'sugarcube-1'
-  // },
-])
-
+// const listStoryFormats = ref([
+//   {
+//     name : 'Chapbook 1.2.1',
+//     val : 'chapbook-1'
+//   },
+//   {
+//     name : 'Chapbook 2.2.0',
+//     val : 'chapbook-2'
+//   },
+//   {
+//     name : 'Harlowe 3.2.3',
+//     val : 'harlowe-3'
+//   },
+//   {
+//     name : 'Harlowe 2.1.0',
+//     val : 'harlowe-2'
+//   },
+//   {
+//     name : 'Harlowe 1.2.4',
+//     val : 'harlowe-1'
+//   },
+//   {
+//     name : 'Snowman 2.0.2',
+//     val : 'snowman-2'
+//   },
+//   {
+//     name : 'Snowman 1.4.0',
+//     val : 'snowman-1'
+//   },
+//   // {
+//   //   name : 'SugarCube 1.0.35',
+//   //   val : 'sugarcube-1'
+//   // },
+//   {
+//     name : 'SugarCube 2.36.1',
+//     val : 'sugarcube-2'
+//   },
+//   {
+//     name : 'Custom',
+//     val : 'custom'
+//   },
+// ])
+  
 // let nameList = dataName.value.map(function(data){
 //   return data.title
 // })
@@ -103,11 +108,63 @@ const cleaningString = (text) => {
 //   });
 // };
 
-function download(filename, text) {
+let filteredStoryFormat = computed(() =>
+  story.story[theStory].storyformats === ''
+    ? story.story[theStory].storyformats
+    : story.storyFormatList.filter((storyFormat) =>
+      {return (storyFormat.val
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .includes(story.story[theStory].storyformats.toLowerCase().replace(/\s+/g, '')))}
+      )
+)
+
+function downloadAsTwee(filename, storyData) {
+  // const new_filename = cleaningString(filename) + '.twee'
+  let theXPos = 0
+  let theYPos = 0
+  let theTwee = ''
+  let storyIfid = storyData.ifid
+  let storyName = filteredStoryFormat.value[0].data.name
+  let storyVersion = filteredStoryFormat.value[0].data.version
+  let storyStart = storyData.passage.filter((onePassage) =>
+      {return (onePassage.pid
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .includes(storyData.startNode.toLowerCase().replace(/\s+/g, '')))}
+      )[0].name
+  theTwee += `:: StoryTitle\n${storyData.title}\n\n\n`
+  theTwee += `:: StoryData\n{\n  "ifid": "${storyIfid}",\n  "format": "${storyName}",\n  "format-version": "${storyVersion}",\n  "start": "${storyStart}",\n  "zoom": 1\n}\n\n\n`
+  storyData.passage.forEach(onePassage => {
+    let dataTmp = onePassage.data
+    let findImagePath = dataTmp.match(/%img%[\s\S]*?%/gi)
+    if (findImagePath && findImagePath.length > 0) {
+      findImagePath.map((e) => {
+        let oldSrc = e.split("%img%").join("").slice(0, -1).trim()
+        const found = story.story[theStory].imageList.find(image => image.name.trim() == oldSrc);
+        if (found) {
+          dataTmp = dataTmp.replace(e, found.src)
+        }
+      })
+    }
+    theTwee += `:: ${onePassage.name} ${onePassage.tags && onePassage.tags.length > 0 ? ' [' + onePassage.tags + '] ' : ''}{"position":"${theXPos},${theYPos}","size":"100,100"}\n${dataTmp}\n\n\n`
+    if (theXPos == 2000) {
+      theXPos = 0
+      theYPos += 100
+    } else {
+      theXPos += 100
+    }
+  });
+  theTwee += `:: StoryScript [script]\n${storyData.userScript}\n\n\n`
+  theTwee += `:: StoryStylesheet [stylesheet]\n${storyData.userStyle}\n\n\n`
+  download(filename, theTwee, 'twee')
+}
+
+function download(filename, text, extention) {
   const new_filename = cleaningString(filename)
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const d = new Date();
-  const fileName = new_filename+'_'+d.getDate()+'_'+months[d.getMonth()]+'_'+d.getFullYear()+'.tweezeldata'
+  const fileName = new_filename+'_'+d.getDate()+'_'+months[d.getMonth()]+'_'+d.getFullYear()+'.'+(extention ? extention : 'tweezeldata')
   var element = document.createElement('a');
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
   element.setAttribute('download', fileName);
@@ -156,11 +213,22 @@ function download(filename, text) {
           <span class="label-text">Story Formats</span>
         </label>
         <select v-model="story.story[theStory].storyformats" class="select select-bordered w-full">
-          <option v-for="data, index in listStoryFormats" :value="data.val" :key='index'>{{data.name}}</option>
+          <option v-for="data, index in story.storyFormatList" :value="data.val" :key='index'>{{data.name}}</option>
         </select>
       </div>
       <div class='p-2'>
-        <div v-if="story.story[theStory].storyformats == 'chapbook-1'">
+        by <span class='font-bold' v-html='filteredStoryFormat[0].data ? (
+          filteredStoryFormat[0].data.author
+        ) : ""'>
+        </span><br />
+        <span v-html='filteredStoryFormat[0].data ? (
+          filteredStoryFormat[0].data.description
+        ) : ""'>
+        </span>
+        <!-- {{ story.storyFormatList.forEach(storyFormat => {
+          return storyFormat.data.description
+        }) }} -->
+        <!-- <div v-if="story.story[theStory].storyformats == 'chapbook-1'">
           A Twine story format emphasizing ease of authoring, multimedia, and playability on many different types of devices. Visit the <a class="text-primary underline" href="https://klembot.github.io/chapbook/guide/" target="_blank" rel="noopener noreferrer">guide</a> for more information.
         </div>
         <div v-if="story.story[theStory].storyformats == 'chapbook-2'">
@@ -196,7 +264,7 @@ function download(filename, text) {
           A Twine 2 port of the Twine 1 story format by the same name. See its <a class="text-primary underline" href="http://www.motoslave.net/sugarcube/1/#documentation" target="_blank" rel="noopener noreferrer">documentation</a>.<br>
           <br>
           License: Simplified BSD License
-        </div>
+        </div> -->
         <div v-if="story.story[theStory].storyformats == 'custom'">
           Write the url to the format.js.
           <input v-model="story.story[theStory].customFormatUrl" type="text" placeholder="Write the url" class="input input-bordered w-full" />
@@ -222,15 +290,22 @@ function download(filename, text) {
       </div>
       <div class='divider'></div>
       <button @click="download(story.story[theStory].title, JSON.stringify(story.story[theStory]))" class="btn btn-primary btn-block my-3">Backup This Story.</button>
-      <p class='text-sm py-2'>It Will Be Saved At "[Internal_Storage] -> Android -> data -> app.rzel.tweezel -> files -> Backup -> [Story Name] -> [Here]". It's Extension Is ".tweezeldata"</p>
-      <p class='text-sm py-2'>Later. U Can Use "Choose Story Backup To Load." Button At The Main Screen Setting To Select The File And Restore Your Backup. Or Just To Share It To Your Friends And Let Them Load Your Story Into Their Devices :).</p>
+      <!-- <p class='text-sm py-2'>It Will Be Saved At "[Internal_Storage] -> Android -> data -> app.rzel.tweezel -> files -> Backup -> [Story Name] -> [Here]". It's Extension Is ".tweezeldata"</p>
+      <p class='text-sm py-2'>Later. U Can Use "Choose Story Backup To Load." Button At The Main Screen Setting To Select The File And Restore Your Backup. Or Just To Share It To Your Friends And Let Them Load Your Story Into Their Devices :).</p> -->
+      <button @click="downloadAsTwee(story.story[theStory].title, story.story[theStory])" class="btn btn-primary btn-block my-3">Export As Twee.</button>
+      <p class='text-sm py-2'>When U Export As Twee.</p>
+      <ul class='list-disc ml-4'>
+        <li>Any Image U Use With TweezeL Image Picker Will Be Exported As Base64 Image.</li>
+        <li>Any Image U Use With TweezeL Image Picker And Not Used, It Will Not Exported.</li>
+        <li>THIS FEATURE IS NOT TESTED MUCH. IT IS TESTED FOR THIS APP AND TWINE AND FOR ME IT IS WORKING.</li>
+      </ul>
     </div>
 
     <div class="w-full p-1 flex flex-col gap-2 grow h-0 overflow-auto" v-if="mode == 'css'">
       <codemirror
         v-model="story.story[theStory].userStyle"
         placeholder="Write The Code Here..."
-        :style="{ 'flex-grow' : '1' }"
+        :style="{ 'flex-grow' : '1', 'background-color' : story.codeDarkTheme ? '' : 'white', 'color' : story.codeDarkTheme ? '' : 'black'}"
         :autofocus="true"
         :indent-with-tab="true"
         :tab-size="2"
@@ -242,7 +317,7 @@ function download(filename, text) {
       <codemirror
         v-model="story.story[theStory].userScript"
         placeholder="Write The Code Here..."
-        :style="{ 'flex-grow' : '1' }"
+        :style="{ 'flex-grow' : '1', 'background-color' : story.codeDarkTheme ? '' : 'white', 'color' : story.codeDarkTheme ? '' : 'black'}"
         :autofocus="true"
         :indent-with-tab="true"
         :tab-size="2"

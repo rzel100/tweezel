@@ -151,6 +151,7 @@ function addImageData(e) {
 
   new Compressor(file, {
     quality: 0.6,
+    convertSize: 0,
     success(result) {
       const resultnya = result
 
@@ -292,7 +293,7 @@ detectLostPath()
                   </div>
                 </div>
                 <router-link :to="`/story/${story.story[theStory].ifid}/edit/${element.pid}`" :class="['py-4 static w-full px-12 truncate']">
-                  {{element.name}}
+                  {{element.name}} <i>{{element.tags && element.tags.length > 0 ? `[${element.tags}]` : ''}}</i>
                 </router-link>
               </div>
             </template>
@@ -303,13 +304,13 @@ detectLostPath()
   </div>
 
   <div class="absolute bottom-5 right-5 flex flex-row gap-5">
-    <router-link :to="`/story/${theIfid}/play`">
+    <!-- <router-link :to="`/story/${theIfid}/play`">
       <button class="btn btn-primary btn-circle cursor-pointer" @click='story.playState = "export"'>
         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 13.5l3 3m0 0l3-3m-3 3v-6m1.06-4.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
         </svg>
       </button>
-    </router-link>
+    </router-link> -->
 
     <router-link :to="`/story/${theIfid}/play`">
       <button class="btn btn-primary btn-circle cursor-pointer" @click='story.playState = "play"'>

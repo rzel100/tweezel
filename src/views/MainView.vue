@@ -4,8 +4,6 @@ import { RouterLink } from 'vue-router'
 import draggable from 'vuedraggable'
 import { createToaster } from "@meforma/vue-toaster";
 import { storyData } from '@/stores/story'
-// import {Directory} from "@capacitor/filesystem";
-// import write_blob from "capacitor-blob-writer";
 const story = storyData()
 const storyName = ref('')
 const isNew = ref(false)
@@ -13,6 +11,7 @@ const mode = ref('story')
 const storyList = ref(story.story)
 const themeList = ref(story.themeList)
 // const storageStatus = ref(false)
+const loadStoryTwee = ref(null)
 const loadStory = ref(null)
 const loadWholeStory = ref(null)
 const installPromptMain = ref(null)
@@ -113,6 +112,75 @@ function checkLegit(data) {
     legit = true
   }
   return legit
+}
+
+function readDataTwee() {
+  let file_to_read = document.getElementById("tweefileinput").files[0]
+  if (file_to_read != undefined) {
+    let fileread = new FileReader()
+    fileread.onload = function(e) {
+      let content = e.target.result
+      const thePassage = content.split("::")
+      let newStory = {
+        title : '',
+        ifid : '',
+        startNode : '1',
+        userStyle : '',
+        userScript : '',
+        storyformats : 'sugarcube-2',
+        imageList: [],
+        customFormatUrl: '',
+        passage : [],
+      }
+      thePassage.map((e, index) => {
+        let passage = {
+          name : '',
+          pid : String(index),
+          data : ``,
+          tags : '',
+        }
+        const theString = String(e).trim()
+        const metaData = theString.split('\n')[0]
+        let findTag = metaData.match(/\[[\s\S]*?\]/gi)
+        let theTitle = metaData.split('{')[0].split('[')[0].trim()
+        let theTags = ''
+        let theData = theString.split(metaData+'\n').join('')
+        if (findTag) {
+          findTag.map((e) => {
+            let oldSrc = e.split("[").join("").slice(0, -1).trim()
+            theTags = oldSrc
+          })
+        }
+        passage.data = String(theData)
+        passage.tags = theTags
+        passage.name = theTitle
+        if (passage.name == 'StoryTitle') {
+          newStory.title = passage.data
+        } else if (passage.name == 'StoryData') {
+          const parsedData = JSON.parse(passage.data)
+          newStory.ifid = parsedData.ifid
+          newStory.startNode = parsedData.start
+        } else if (passage.name == 'StoryScript') {
+          newStory.userScript = passage.data
+        } else if (passage.name == 'StoryStylesheet') {
+          newStory.userStyle = passage.data
+        } else {
+          if (passage.name.length > 0) {
+            newStory.passage.push(passage)
+          }
+        }
+      })
+      let done = false
+      newStory.passage.map((e) => {
+        if (e.name === newStory.startNode && !done) {
+          done = true
+          newStory.startNode = e.pid
+        }
+      })
+      story.story.push(newStory)
+    }
+    fileread.readAsText(file_to_read)
+  }
 }
 
 function readData() {
@@ -365,15 +433,23 @@ const openAboutModal = () => {
 
       <div class='divider'></div>
 
+      <p class='text-base py-2'>Load Story From Twee File.</p>
+      <p class='text-sm py-2'>IT IS NOT TESTED MUCH BUT EXPECTED TO WORK USING TWEE FILES EXPORTED FROM HERE AND TWINE !.</p>
+      <p class='text-sm py-2'>Story Loaded From Twee File Will Have Sugarcube 2 Format By Default.</p>
+      <button @click='loadStoryTwee.click()' class='btn btn-primary btn-block btn-sm'>Choose File To Load.</button>
+      <input @change='readDataTwee' class="h-0 w-0" type="file" id="tweefileinput" ref='loadStoryTwee' accept='.twee' />
+
+      <div class='divider'></div>
+
       <p class='text-base py-2'>Load Story From Backup.</p>
-      <p class='text-sm py-2'>IF THE STORY IS ALREADY EXIST. THIS WILL REPLACE IT !.</p>
+      <!-- <p class='text-sm py-2'>IF THE STORY IS ALREADY EXIST. THIS WILL REPLACE IT !.</p> -->
       <button @click='loadStory.click()' class='btn btn-primary btn-block btn-sm'>Choose Story Backup To Load.</button>
       <input @change='readData' class="h-0 w-0" type="file" id="jsonfileinput" ref='loadStory' accept='.tweezeldata' />
 
       <div class='divider'></div>
 
       <p class='text-base py-2'>Create Backup Of An Entire Story.</p>
-      <p class='text-sm py-2'>It Will Be Saved At "[Internal_Storage] -> Android -> data -> app.rzel.tweezel -> files -> Global_Backup -> [Here]". It's Extension Is ".tweezeldata"</p>
+      <!-- <p class='text-sm py-2'>It Will Be Saved At "[Internal_Storage] -> Android -> data -> app.rzel.tweezel -> files -> Global_Backup -> [Here]". It's Extension Is ".tweezeldata"</p> -->
       <p class='text-sm py-2'>Later. U Can Use "Choose Whole Story Backup To Load." Button To Select The File And Restore Your Backup. Or Just To Share It To Your Friends And Let Them Load Your Story Into Their Devices :).</p>
       <button @click="download('TweezeL Backup', JSON.stringify(story.story))" class='btn btn-primary btn-block btn-sm'>Backup The Entire Story.</button>
 

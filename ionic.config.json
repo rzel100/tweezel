@@ -1,7 +1,0 @@
-{
-  "name": "TweezeL",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "custom"
-}

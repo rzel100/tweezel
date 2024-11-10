@@ -6,7 +6,6 @@ This Tools Build With **VueJS 3 + Tailwind Css + Daisy UI** For Styling.
 Link Tools :
 
 - [Github Pages](https://rzel100.github.io/tweezel-web/)
-- ~NEW...!!! Android...!!! https://play.google.com/store/apps/details?id=app.rzel.tweezel~ Next Update Will Remove It From Playstore...
 
 Now Support All Official Listed Story Formats On Twine 2.  
 Such As Chapbook, Harlowe, Snowman, And Sugarcube.
@@ -44,9 +43,15 @@ Give It A Try. :3.
 - [x] Error Detection... It Will Notice You Where The Passage Path Error On The Story...
 - [x] Now It Use Online Source Of Story Formats Instead Of Local...
 - [x] Experimental : Now You Can Use Custom Story Formats. (Probably Not Work At All... Tested Only To Official Format...)
+- [x] Now You Can Import From Twee File As Well As Export It To Twee File. (Not Tested Much... But Expected To Work For Twine To Tweezel And Vice Versa...)
 
 <hr>
 
 For Next Objective Of This Tools, I Want This Tools To :
 
 - Adding My Tutorial To TweezeL.
+
+<hr>
+
+### Note
+First Of All Thanks All For Using This App And Giving Suggestions On This App. That This App Become Better And Better Each Update. And Yes, I'm Sorry, I've Been Neglecting This App Too Much. Even Neglecting It For Month. But Now. After All This Years. I Can Tell All My Ideal Feature For This App Is All Done. TweezeL Finally Completed, Based On What I Want For This App. So. Probably I'll Not Updating This App That Much Beside Bugs, Maybe I'll Still Add Some New Feature But Don't Expect Me That Much.

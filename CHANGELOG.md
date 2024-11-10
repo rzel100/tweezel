@@ -214,3 +214,15 @@ List Addition / Changes :
 - Removing Android Build. Too Much Work. Go Back To Old Web Based.
 - Now Using Github Pages For Website Build.
 - Now Code Editor Have Dark And Light Theme. Who Choose Light Theme ?. Light Attract Bugs. :) That's Why Default Is Dark Theme.
+
+## 1.5.0
+
+Date : 10-November-2024
+
+> major Update.
+
+List Addition / Changes :
+
+- You Now Can Export To .twee File. (Not Tested Much, But Expected To Work From Twine To TweezeL And Vice Versa)
+- You Now Can Also Import From .twee File. (Not Tested Much, But Expected To Work From Twine To TweezeL And Vice Versa)
+- Removing All Capacitor Packages. Since I'm Not Gonna Export This App To Android Anytime Soon.
