@@ -43,7 +43,7 @@ Give It A Try. :3.
 - [x] Error Detection... It Will Notice You Where The Passage Path Error On The Story...
 - [x] Now It Use Online Source Of Story Formats Instead Of Local...
 - [x] Experimental : Now You Can Use Custom Story Formats. (Probably Not Work At All... Tested Only To Official Format...)
-- [x] Now You Can Import From Twee File As Well As Export It To Twee File. (Not Tested Much... But Expected To Work For Twine To Tweezel And Vice Versa...)
+- [x] Now You Can Import From Twee File As Well As Export It To Twee File. (Not Tested Much... But Expected To Work For Twine To TweezeL And Vice Versa...)
 
 <hr>
 
